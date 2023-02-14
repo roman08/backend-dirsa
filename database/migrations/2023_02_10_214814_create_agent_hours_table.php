@@ -15,22 +15,22 @@ class CreateAgentHoursTable extends Migration
     {
         Schema::create('agent_hours', function (Blueprint $table) {
             $table->id();
-            $table->integer('id_usuario_registro');
-            $table->integer('tipo_fuente');
-            $table->integer('numero_empleado');
-            $table->string('nombre_completo_agente');
-            $table->string('agente_nombre');
-            $table->string('agente_paterno');
-            $table->string('agente_materno');
-            $table->string('email_agente_fuente');
-            $table->time('horas_sistema_agente');
-            $table->time('horas_login_agente');
-            $table->time('horas_logout_agente');
-            $table->time('tiempo_conexion_agente');
+            $table->integer('id_usuario_registro')->nullable();
+            $table->integer('tipo_fuente')->nullable();
+            $table->integer('numero_empleado')->nullable();
+            $table->string('nombre_completo_agente')->nullable();
+            $table->string('agente_nombre')->nullable();
+            $table->string('agente_paterno')->nullable();
+            $table->string('agente_materno')->nullable();
+            $table->string('email_agente_fuente')->nullable();
+            $table->time('horas_sistema_agente')->nullable();
+            $table->time('horas_login_agente')->nullable();
+            $table->time('horas_logout_agente')->nullable();
+            $table->time('tiempo_conexion_agente')->nullable();
             $table->float('procentaje_conexion_agente')->nullable();
-            $table->time('tiempo_descanso_agente');
-            $table->time('tiempo_entrenamiento_agente');
-            $table->time('tiempo_reuniones_agente');
+            $table->time('tiempo_descanso_agente')->nullable();
+            $table->time('tiempo_entrenamiento_agente')->nullable();
+            $table->time('tiempo_reuniones_agente')->nullable();
             $table->timestamps();
         });
     }
