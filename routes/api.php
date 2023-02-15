@@ -51,6 +51,7 @@ Route::post('/campania/addMonth', [CampaniaController::class, 'addMonth']);
 
 //  ROUTES CONTROL HORAS
 Route::post('/checkHours/importData', [CheckHoursController::class, 'importData']);
+Route::post('/checkHours/loadJson', [CheckHoursController::class, 'loadJson']);
 
 // TODO: RUTAS ENTRENADOR
 Route::get('/obtenerEntrenadores', [CoachController::class, 'index'])->middleware('auth:sanctum');
