@@ -6,6 +6,7 @@ use App\Http\Controllers\GroupController;
 use App\Http\Controllers\GeneralController;
 use App\Http\Controllers\CampaniaController;
 use App\Http\Controllers\CheckHoursController;
+use App\Http\Controllers\LeaderContoller;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -52,6 +53,10 @@ Route::post('/campania/addMonth', [CampaniaController::class, 'addMonth']);
 //  ROUTES CONTROL HORAS
 Route::post('/checkHours/importData', [CheckHoursController::class, 'importData']);
 Route::post('/checkHours/loadJson', [CheckHoursController::class, 'loadJson']);
+
+//  ROUTES 
+Route::get('/leader/campanias', [LeaderContoller::class, 'getCampaniasLeader']);
+
 
 // TODO: RUTAS ENTRENADOR
 Route::get('/obtenerEntrenadores', [CoachController::class, 'index'])->middleware('auth:sanctum');

@@ -14,11 +14,6 @@ class Campania extends Model
     public function leaders(){
 
         return $this->belongsToMany('App\Models\User', 'campania_supervisors', 'id_campania', 'id_supervisor');
-        // return $this->hasMany('App\Models\CampaniaSupervisor', 'id_campania', 'id');
-
-        
-
-
     }
 
     public function groups(){

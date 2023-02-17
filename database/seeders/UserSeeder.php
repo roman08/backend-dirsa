@@ -17,16 +17,16 @@ class UserSeeder extends Seeder
     {
         //
         DB::table('users')->insert([
-            'nombre' => 'Usuario - Admin',
-            'usuario' => 'admin',
-            'email' => 'admin@google.com',
+            'nombre' => 'Usuario - supervisor',
+            'usuario' => 'supervisor',
+            'email' => 'supervisor@google.com',
             'password' => Hash::make('admin123'),
-            'id_tipo_usuario' => 1,
-            'apellido_pat' => 'admin',
-            'apellido_mat' => 'admin',
+            'id_tipo_usuario' => 3,
+            'apellido_pat' => 'supervisor',
+            'apellido_mat' => 'supervisor',
             'id_ubicacion' => 1,
             'id_empresa_rh' => 1,
-            'nombre_completo' => 'Usuario - Admin',
+            'nombre_completo' => 'Usuario - supervisor',
             'numero_empleado' => 1,
             'id_puesto' => 1,
             'id_estatus' => 1

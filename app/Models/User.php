@@ -48,4 +48,11 @@ class User extends Authenticatable
     public function role(){
         return $this->hasOne('App\Models\TipoUsuario', 'id', 'id_tipo_usuario');
     }
+
+    public function campanias()
+    {
+
+        return $this->belongsToMany('App\Models\Campania', 'campania_supervisors', 'id_supervisor','id_campania',);
+    }
+
 }

@@ -16,6 +16,7 @@ class TipoUsuarioSeeder extends Seeder
         $data = [
             ['nombre' => 'Super Administrador', 'estatus' => 'Activo'],
             ['nombre' => 'Administrador', 'estatus' => 'Activo'],
+            ['nombre' => 'Supervior', 'estatus' => 'Activo'],
             ['nombre' => 'Agente', 'estatus' => 'Activo']
         ];
 
