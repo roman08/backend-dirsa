@@ -66,7 +66,7 @@ class CoachRequest extends FormRequest
             'status'    => 'error',
             'success'   => false,
             'message'   => 'Validation errors',
-            'data'      => $validator->errors()
+            'data'      => $validator->errors()->first()
         ]));
 
     }
