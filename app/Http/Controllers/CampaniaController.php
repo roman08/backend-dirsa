@@ -8,15 +8,19 @@ use App\Models\Campania;
 use App\Models\CampaniaGrupoAgentes;
 use App\Models\CampaniaSupervisor;
 use App\Models\CampaniaConfiguracionPorMes;
+
+use Illuminate\Support\Facades\DB;
+
 class CampaniaController extends Controller
 {
-    public function create( Request $request){
+    public function create(Request $request)
+    {
 
         $validatedData = $request->validate([
             'nombre' => 'required|string|max:50',
             'fecha_creacion' => '',
-            'bilingue' =>'',
-            'id_forma_de_pago' =>'',
+            'bilingue' => '',
+            'id_forma_de_pago' => '',
             'id_supervisor' => '',
             'id_grupo' => ''
 
@@ -34,7 +38,7 @@ class CampaniaController extends Controller
         ]);
 
 
-       CampaniaSupervisor::create([
+        CampaniaSupervisor::create([
             'id_campania' => $campania->id,
             'id_supervisor' => $validatedData['id_supervisor'],
         ]);
@@ -44,35 +48,36 @@ class CampaniaController extends Controller
             'id_grupo' => $validatedData['id_grupo'],
         ]);
 
-        
+
 
 
 
 
         return response()->json([
-                'status' => 'success',
-                'message' => 'Campaña creada correctamente',
-            ], 200);
-
+            'status' => 'success',
+            'message' => 'Campaña creada correctamente',
+        ], 200);
     }
 
 
-    public function get(){
+    public function get()
+    {
         $campanias = Campania::with('groups')->with('leaders')->with('typePay')->with('months')->get();
         return response()->json([
-                'status' => 'success',
-                'message' => 'Get campañas',
-                'data' => $campanias
-            ], 200);
+            'status' => 'success',
+            'message' => 'Get campañas',
+            'data' => $campanias
+        ], 200);
     }
 
-    public function addMonth( Request $request) {
-         $validatedData = $request->validate([
+    public function addMonth(Request $request)
+    {
+        $validatedData = $request->validate([
             'id_campania' => 'required',
             'anio' => '',
-            'id_mes' =>'',
+            'id_mes' => '',
             'dias_habiles' => '',
-            'numero_agentes' =>'',
+            'numero_agentes' => '',
             'hrs_jornada' => '',
             'precio_hr' => '',
             'tipo_moneda' => '',
@@ -98,9 +103,19 @@ class CampaniaController extends Controller
 
 
         return response()->json([
-                'status' => 'success',
-                'message' => 'Mes agregado correctamente',
-            ], 200);
+            'status' => 'success',
+            'message' => 'Mes agregado correctamente',
+        ], 200);
+    }
 
+    public function getCampaaniasAdmin()
+    {
+        $campanias = Campania::with('groups.agentes')->get();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Datos botenidos correctamente',
+            'data' => $campanias
+        ], 200);
     }
 }

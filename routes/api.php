@@ -48,7 +48,7 @@ Route::get('/leaders', [GeneralController::class, 'getLeaders']);
 Route::get('/campanias', [CampaniaController::class, 'get']);
 Route::post('/campania/create', [CampaniaController::class, 'create']);
 Route::post('/campania/addMonth', [CampaniaController::class, 'addMonth']);
-
+Route::get('/campanias/getCampaaniasAdmin', [CampaniaController::class, 'getCampaaniasAdmin']);
 
 //  ROUTES CONTROL HORAS
 Route::post('/checkHours/importData', [CheckHoursController::class, 'importData']);
