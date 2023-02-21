@@ -138,88 +138,88 @@ class CheckHoursController extends Controller
     $datos = json_decode($request['data'], true, 512, JSON_THROW_ON_ERROR);
 
     try {
-        switch ($tipo_fuente) {
-            case 1:
+            switch ($tipo_fuente) {
+                case 1:
 
-                unset($datos[0]);
-                
-                
+                    unset($datos[0]);
+                    
+                    
 
-                foreach ( $datos as $dato) {
-                    $hour_system = (!empty($dato['System Hrs to Away from Desk %']) ? $dato['System Hrs to Away from Desk %'] : null );
-                    $hour_system_final = ( !empty($hour_system) ) ? substr($hour_system, 0, -1) : 0;
-                     
-                    $data = [
-                        "id_usuario_registro" => $request['user_id'],
-                        "tipo_fuente" => $request['tipo_fuente'],
-                        "numero_empleado" => $dato['No empleado'],
-                        "nombre_completo_agente" =>  $dato['DisplayName'],
-                        "agente_nombre" =>  '',
-                        "agente_paterno" => '',
-                        "agente_materno" => '',
-                        "email_agente_fuente" => '',
-                        "horas_sistema_agente" => $dato['System Hrs Formato HR'], // columna C
-                        "horas_login_agente" => '', 
-                        "horas_logout_agente" => '', 
-                        "tiempo_conexion_agente" =>  $dato['AFD Formato HR'],
-                        "procentaje_conexion_agente" =>  $hour_system_final ,
-                        "tiempo_descanso_agente" =>  $dato['30 Minute Break Formato HR'],
-                        "tiempo_entrenamiento_agente" =>  $dato['Program Training Formato HR'],
-                        "tiempo_reuniones_agente" =>  $dato['Meeting-Supervisor Formato HR'],
-                    ];
-                   
-                    AgentHours::create($data);
-                }
-
-                break;
-            case 2:
-                foreach ( $datos as $row_range ) {
-                    $data = [
+                    foreach ( $datos as $dato) {
+                        $hour_system = (!empty($dato['System Hrs to Away from Desk %']) ? $dato['System Hrs to Away from Desk %'] : null );
+                        $hour_system_final = ( !empty($hour_system) ) ? substr($hour_system, 0, -1) : 0;
+                        
+                        $data = [
                             "id_usuario_registro" => $request['user_id'],
-                            "tipo_fuente" => $tipo_fuente,
-                            "numero_empleado" => $row_range['NO EMPLEADO'],
-                            "nombre_completo_agente" => $row_range['AGENT FIRST NAME'].' '.$row_range['AGENT LAST NAME'],
-                            "agente_nombre" =>  $row_range['AGENT FIRST NAME'],
-                            "agente_paterno" => $row_range['AGENT LAST NAME'],
+                            "tipo_fuente" => $request['tipo_fuente'],
+                            "numero_empleado" => $dato['No empleado'],
+                            "nombre_completo_agente" =>  $dato['DisplayName'],
+                            "agente_nombre" =>  '',
+                            "agente_paterno" => '',
                             "agente_materno" => '',
-                            "email_agente_fuente" => $row_range['AGENT'],
-                            "horas_sistema_agente" => '01:20:35', // columna C
-                            "horas_login_agente" => $row_range['LOGIN TIMESTAMP_1'], 
-                            "horas_logout_agente" => $row_range['LOGOUT TIMESTAMP_1'], 
-                            "tiempo_conexion_agente" => $row_range['LOGIN TIME'], // columna D
-                            "procentaje_conexion_agente" => 0,
-                            "tiempo_descanso_agente" => '', // columna F
-                            "tiempo_entrenamiento_agente" => '', // columna H
-                            "tiempo_reuniones_agente" => '', // columna I
-                    ];
-                    AgentHours::create($data);
-                }
-                break;
-            default:
-                return response()->json([
-                'status' => 'error',
-                'msg' =>'El tipo de fuente no existe.',
-                'data' => $error_code
-            ]);
-                break;
-        }
+                            "email_agente_fuente" => '',
+                            "horas_sistema_agente" => $dato['System Hrs Formato HR'], // columna C
+                            "horas_login_agente" => '', 
+                            "horas_logout_agente" => '', 
+                            "tiempo_conexion_agente" =>  $dato['AFD Formato HR'],
+                            "procentaje_conexion_agente" =>  $hour_system_final ,
+                            "tiempo_descanso_agente" =>  $dato['30 Minute Break Formato HR'],
+                            "tiempo_entrenamiento_agente" =>  $dato['Program Training Formato HR'],
+                            "tiempo_reuniones_agente" =>  $dato['Meeting-Supervisor Formato HR'],
+                        ];
+                    
+                        AgentHours::create($data);
+                    }
+
+                    break;
+                case 2:
+                    foreach ( $datos as $row_range ) {
+                        $data = [
+                                "id_usuario_registro" => $request['user_id'],
+                                "tipo_fuente" => $tipo_fuente,
+                                "numero_empleado" => $row_range['NO EMPLEADO'],
+                                "nombre_completo_agente" => $row_range['AGENT FIRST NAME'].' '.$row_range['AGENT LAST NAME'],
+                                "agente_nombre" =>  $row_range['AGENT FIRST NAME'],
+                                "agente_paterno" => $row_range['AGENT LAST NAME'],
+                                "agente_materno" => '',
+                                "email_agente_fuente" => $row_range['AGENT'],
+                                "horas_sistema_agente" => '01:20:35', // columna C
+                                "horas_login_agente" => $row_range['LOGIN TIMESTAMP_1'], 
+                                "horas_logout_agente" => $row_range['LOGOUT TIMESTAMP_1'], 
+                                "tiempo_conexion_agente" => $row_range['LOGIN TIME'], // columna D
+                                "procentaje_conexion_agente" => 0,
+                                "tiempo_descanso_agente" => '', // columna F
+                                "tiempo_entrenamiento_agente" => '', // columna H
+                                "tiempo_reuniones_agente" => '', // columna I
+                        ];
+                        AgentHours::create($data);
+                    }
+                    break;
+                default:
+                    return response()->json([
+                    'status' => 'error',
+                    'msg' =>'El tipo de fuente no existe.',
+                    'data' => $error_code
+                ]);
+                    break;
+            }
 
 
     
-        return response()->json([
-            'status' => 'success',
-            'msg' =>' Datos guardados correctamente.',
-            'data' => $datos
-        ]);
-    } catch (Exception $e) {
-        $error_code = $e->errorInfo[1];
-        return response()->json([
-            'status' => 'error',
-            'msg' =>' Datos',
-            'data' => $error_code
-        ]);
-    //    return back()->withErrors('There was a problem uploading the data!');
-    }
+            return response()->json([
+                'status' => 'success',
+                'msg' =>' Datos guardados correctamente.',
+                'data' => $datos
+            ]);
+        } catch (Exception $e) {
+            $error_code = $e->errorInfo[1];
+            return response()->json([
+                'status' => 'error',
+                'msg' =>' Datos',
+                'data' => $error_code
+            ]);
+        //    return back()->withErrors('There was a problem uploading the data!');
+        }
   
    }
 

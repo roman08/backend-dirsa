@@ -39,6 +39,7 @@ Route::get('/get-groups', [GroupController::class, 'getGroups']);
 Route::post('/create-group', [GroupController::class, 'createGroup']);
 
 // ROUTES GENERALES
+Route::get('/agents/all', [GeneralController::class, 'getAllAgents']);
 Route::get('/agents', [GeneralController::class, 'getAgents']);
 Route::get('/typePays', [GeneralController::class, 'getTypePays']);
 Route::get('/leaders', [GeneralController::class, 'getLeaders']);
@@ -49,6 +50,11 @@ Route::get('/campanias', [CampaniaController::class, 'get']);
 Route::post('/campania/create', [CampaniaController::class, 'create']);
 Route::post('/campania/addMonth', [CampaniaController::class, 'addMonth']);
 Route::get('/campanias/getCampaaniasAdmin', [CampaniaController::class, 'getCampaaniasAdmin']);
+Route::get('/campanias/delete', [CampaniaController::class, 'delete']);
+Route::get('/campanias/getById', [CampaniaController::class, 'getById']);
+Route::post('/campania/update', [CampaniaController::class, 'update']);
+
+
 
 //  ROUTES CONTROL HORAS
 Route::post('/checkHours/importData', [CheckHoursController::class, 'importData']);

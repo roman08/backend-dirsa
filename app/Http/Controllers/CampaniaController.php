@@ -62,13 +62,26 @@ class CampaniaController extends Controller
 
     public function get()
     {
-        $campanias = Campania::with('groups')->with('leaders')->with('typePay')->with('months')->get();
+        $campanias = Campania::with('groups')->with('leaders')->with('typePay')->with('months')->where('estatus', '=', 'Activo')->get();
         return response()->json([
             'status' => 'success',
             'message' => 'Get campañas',
             'data' => $campanias
         ], 200);
     }
+
+
+    public function getById(Request $request)
+    {
+        $id = $request->get('id');
+        $campanias = Campania::with('groups')->with('leaders')->with('typePay')->with('months')->where('id', '=', $id)->first();
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Datos campaña',
+            'data' => $campanias
+        ], 200);
+    }
+
 
     public function addMonth(Request $request)
     {
@@ -117,5 +130,69 @@ class CampaniaController extends Controller
             'message' => 'Datos botenidos correctamente',
             'data' => $campanias
         ], 200);
+    }
+
+    public function delete(Request $request){
+
+        $id = $request->get('id');
+        try {
+            $campania = Campania::find($id);
+
+            $campania->estatus = 'Inactivo';
+            $campania->save();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Campaña eliminada correctamente.',
+                'data' => $campania
+            ], 200);
+        } catch (\Throwable $th) {
+            $error_code = $th->errorInfo[1];
+            return response()->json([
+                'status' => 'error',
+                'msg' => 'Error al eliminar la campaña, intetelo nuevamente.',
+                'data' => $error_code
+            ]);
+        }
+ 
+    }
+
+    public function update( Request $request){
+
+        $id = $request['id'];
+        $campania = Campania::find($id);
+
+       
+        $campania->bilingue = $request['bilingue'];
+        $campania->fecha_creacion = $request['fecha_creacion'];
+        $campania->nombre =  $request['nombre'];
+        $campania->id_forma_de_pago = $request['id_forma_de_pago'];
+
+
+        $campania->save();
+
+       
+        $cs = CampaniaSupervisor::where('id_campania', $id)->delete();
+        
+        
+
+        CampaniaSupervisor::create([
+            'id_campania' => $campania->id,
+            'id_supervisor' => $request['id_supervisor'],
+        ]);
+
+        $ca = CampaniaGrupoAgentes::where('id_campania', $id)->delete();
+        
+        CampaniaGrupoAgentes::create([
+            'id_campania' => $campania->id,
+            'id_grupo' => $request['id_grupo'],
+        ]);
+
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Campaña actualizada correctamente.',
+            'data' => $request['id']
+        ], 200); 
     }
 }
