@@ -7,13 +7,15 @@ use Illuminate\Http\Request;
 use App\Models\Grupo;
 use App\Models\GrupoUsuario;
 use DateTime;
+use PHPUnit\TextUI\XmlConfiguration\Group;
+
 class GroupController extends Controller
 {
 
     public function getGroups(){
         
         // $users = $this->user->with('salutation')->all();
-        $groups = Grupo::with('agentes')->get();
+        $groups = Grupo::with('agentes')->where('estatus', '=', 'Activo')->get();
        return response()->json([
                 'status' => 'success',
                 'message' => 'Create group',
@@ -27,7 +29,8 @@ class GroupController extends Controller
         $validatedData = $request->validate([
             'nombre' => 'required|string|max:50',
             'estatus' => '',
-            'agents' =>''
+            'agents' =>'',
+            'id_tipo_agente' => ''
         ]);
 
 
@@ -35,6 +38,7 @@ class GroupController extends Controller
         $group = Grupo::create([
             'nombre' => $validatedData['nombre'],
             'estatus' => $validatedData['estatus'],
+            'id_tipo_agente' => $validatedData['id_tipo_agente'],
         ]);
 
         
@@ -54,5 +58,63 @@ class GroupController extends Controller
                 'status' => 'success',
                 'message' => 'Grupo creado correctamente',
             ], 200);
+    }
+
+    public function delete(Request $request) {
+
+        $id = $request['id'];
+
+        $group = Grupo::find($id);
+        $group->estatus = 'Inactivo';
+        $group->save();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Grupo eliminado correctamente',
+            'data' => ''
+        ], 200);
+    }
+
+    public function getById(Request $request) {
+        $id = $request['id'];
+        $group = Grupo::with('agentes')->find($id);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Grupo obtenido correctamente',
+            'data' => $group
+        ], 200);
+    }
+
+    public function update( Request $request ){
+
+        $datetime = new \DateTime('NOW');
+
+        $id = $request['id'];
+        $group = Grupo::find($id);
+
+        $group->nombre = $request['nombre'];
+        $group->estatus = $request['estatus'];
+        $group->id_tipo_agente = $request['id_tipo_agente'];
+
+        $group->save();
+
+        GrupoUsuario::where('id_grupo', $id)->delete();
+
+        foreach ($request['agents'] as $value) {
+            $user = GrupoUsuario::create([
+                'id_usuario' => $value,
+                'id_grupo' => $id,
+                'fecha_ingreso' => $datetime,
+                'fecha_salida' => $datetime
+            ]);
+        }
+        
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Grupo actualizado correctamente',
+            'data' => $group
+        ], 200);
     }
 }
