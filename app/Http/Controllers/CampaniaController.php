@@ -195,4 +195,34 @@ class CampaniaController extends Controller
             'data' => $request['id']
         ], 200); 
     }
+
+
+    public function getCampaniaAgent( Request $request){
+
+        $id = $request->get('id');
+
+        $data = DB::table('agent_hours')
+        ->select('agent_hours.created_at as fecha', DB::raw("count('agent_hours.created_at') as total"), DB::raw("TIME_FORMAT(SEC_TO_TIME(SUM(TIME_TO_SEC(agent_hours.tiempo_conexion_agente))), '%H:%i:%s') as tiempo_total"))
+        ->where('agent_hours.tipo_fuente', '=', $id)
+        ->groupBy('agent_hours.created_at')
+        ->get();
+
+        $datos_configuracion = DB::table('campania_configuracion_por_mes')
+        ->select('*')
+        ->where('id_campania', '=', 3)
+        ->where('id_mes', '=', 4)
+        ->get()[0];
+
+
+        $respuesta = [
+            'respuesta' => $datos_configuracion,
+            'data' => $data
+        ];
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Campaña actualizada correctamente.',
+            'data' => $respuesta
+        ], 200); 
+    }
 }

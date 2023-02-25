@@ -55,7 +55,7 @@ Route::get('/campanias/getCampaaniasAdmin', [CampaniaController::class, 'getCamp
 Route::get('/campanias/delete', [CampaniaController::class, 'delete']);
 Route::get('/campanias/getById', [CampaniaController::class, 'getById']);
 Route::post('/campania/update', [CampaniaController::class, 'update']);
-
+Route::get('/campanias/getCampaniaAgent', [CampaniaController::class, 'getCampaniaAgent']);
 
 
 //  ROUTES CONTROL HORAS
