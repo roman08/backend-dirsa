@@ -45,6 +45,7 @@ Route::get('/agents/all', [GeneralController::class, 'getAllAgents']);
 Route::get('/agents', [GeneralController::class, 'getAgents']);
 Route::get('/typePays', [GeneralController::class, 'getTypePays']);
 Route::get('/leaders', [GeneralController::class, 'getLeaders']);
+Route::get('/origins', [GeneralController::class, 'getTypeOrigins']);
 
 
 // ROUTES CAMPAÑAS 
@@ -56,7 +57,7 @@ Route::get('/campanias/delete', [CampaniaController::class, 'delete']);
 Route::get('/campanias/getById', [CampaniaController::class, 'getById']);
 Route::post('/campania/update', [CampaniaController::class, 'update']);
 Route::get('/campanias/getCampaniaAgent', [CampaniaController::class, 'getCampaniaAgent']);
-
+Route::get('/campanias/getHoursAdmin', [CampaniaController::class, 'get_hours_admin']);
 
 //  ROUTES CONTROL HORAS
 Route::post('/checkHours/importData', [CheckHoursController::class, 'importData']);

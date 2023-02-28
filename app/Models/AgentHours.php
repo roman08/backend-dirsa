@@ -24,5 +24,7 @@ class AgentHours extends Model
             'procentaje_conexion_agente',
             'tiempo_descanso_agente',
             'tiempo_entrenamiento_agente',
-            'tiempo_reuniones_agente'];
+            'tiempo_reuniones_agente',
+            'id_campania',
+            'day_register'];
 }

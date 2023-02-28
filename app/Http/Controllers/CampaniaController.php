@@ -22,7 +22,9 @@ class CampaniaController extends Controller
             'bilingue' => '',
             'id_forma_de_pago' => '',
             'id_supervisor' => '',
-            'id_grupo' => ''
+            'id_grupo' => '',
+            'id_type_origin' => '',
+            
 
         ]);
 
@@ -34,6 +36,8 @@ class CampaniaController extends Controller
             'fecha_creacion' => $validatedData['fecha_creacion'],
             'bilingue' => $validatedData['bilingue'],
             'id_forma_de_pago' => $validatedData['id_forma_de_pago'],
+            'id_type_origin' => $validatedData['id_type_origin'],
+            
 
         ]);
 
@@ -199,11 +203,14 @@ class CampaniaController extends Controller
 
     public function getCampaniaAgent( Request $request){
 
-        $id = $request->get('id');
-
+        $id_usuario_registro = $request->get('id_usuario_registro');
+        $id_type_origin = $request->get('id_type_origin');
+        $id_campania = $request->get('id_campania');;
         $data = DB::table('agent_hours')
         ->select('agent_hours.created_at as fecha', DB::raw("count('agent_hours.created_at') as total"), DB::raw("TIME_FORMAT(SEC_TO_TIME(SUM(TIME_TO_SEC(agent_hours.tiempo_conexion_agente))), '%H:%i:%s') as tiempo_total"))
-        ->where('agent_hours.tipo_fuente', '=', $id)
+        ->where('agent_hours.tipo_fuente', '=', $id_type_origin)
+        ->where('agent_hours.id_usuario_registro', '=', $id_usuario_registro)
+        ->where('agent_hours.id_campania', '=', $id_campania)
         ->groupBy('agent_hours.created_at')
         ->get();
 
@@ -216,12 +223,26 @@ class CampaniaController extends Controller
 
         $respuesta = [
             'respuesta' => $datos_configuracion,
-            'data' => $data
+            'data' => $data,
+            'id_type_origin' => $id_type_origin
         ];
 
         return response()->json([
             'status' => 'success',
             'message' => 'Campaña actualizada correctamente.',
+            'data' => $respuesta
+        ], 200); 
+    }
+
+
+    public function get_hours_admin(){
+
+        $respuesta = DB::select('CALL get_hours_admin()');
+
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Datos obtenidos correctamente.',
             'data' => $respuesta
         ], 200); 
     }

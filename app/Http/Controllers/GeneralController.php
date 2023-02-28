@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 
 use App\Models\User;
 use App\Models\TypePay;
+use App\Models\CatTypeOrigin;
+
 
 class GeneralController extends Controller
 {
@@ -56,5 +58,15 @@ class GeneralController extends Controller
             ], 200);
     }
 
+    public function getTypeOrigins(){
+        $origins = CatTypeOrigin::all();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Oirigenes obtenidos correctamente',
+            'data' => $origins
+        ], 200);
+
+    }
 
 }

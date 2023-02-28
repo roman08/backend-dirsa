@@ -9,7 +9,7 @@ class Campania extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['nombre', 'estatus', 'fecha_creacion', 'bilingue', 'id_forma_de_pago', 'id_supervisor', 'id_grupo'];
+    protected $fillable = ['nombre', 'estatus', 'fecha_creacion', 'bilingue', 'id_forma_de_pago', 'id_supervisor', 'id_grupo', 'id_type_origin'];
 
     public function leaders(){
 

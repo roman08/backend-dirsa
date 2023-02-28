@@ -106,7 +106,15 @@ class CheckHoursController extends Controller
                     }
 
                     break;
-                default:
+                case 10:
+                    return response()->json([
+                        'status' => 'success',
+                        'msg' => 'otros Datos guardados correctamente.',
+                       
+                    ]);
+                    break;
+
+                    default:
                     # code...
                     break;
             }
@@ -166,6 +174,7 @@ class CheckHoursController extends Controller
                             "tiempo_descanso_agente" =>  $dato['30 Minute Break Formato HR'],
                             "tiempo_entrenamiento_agente" =>  $dato['Program Training Formato HR'],
                             "tiempo_reuniones_agente" =>  $dato['Meeting-Supervisor Formato HR'],
+                            
                         ];
                     
                         AgentHours::create($data);
@@ -191,6 +200,8 @@ class CheckHoursController extends Controller
                                 "tiempo_descanso_agente" => '', // columna F
                                 "tiempo_entrenamiento_agente" => '', // columna H
                                 "tiempo_reuniones_agente" => '', // columna I
+                                'id_campania' => $request['id_campania'],
+                                'day_register' => $request['day_register'],
                         ];
                         AgentHours::create($data);
                     }
@@ -199,7 +210,7 @@ class CheckHoursController extends Controller
                     return response()->json([
                     'status' => 'error',
                     'msg' =>'El tipo de fuente no existe.',
-                    'data' => $error_code
+                    
                 ]);
                     break;
             }
