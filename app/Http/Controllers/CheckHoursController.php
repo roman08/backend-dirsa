@@ -192,14 +192,14 @@ class CheckHoursController extends Controller
                                 "agente_paterno" => $row_range['AGENT LAST NAME'],
                                 "agente_materno" => '',
                                 "email_agente_fuente" => $row_range['AGENT'],
-                                "horas_sistema_agente" => '01:20:35', // columna C
+                                "horas_sistema_agente" => '00:00:00', // columna C
                                 "horas_login_agente" => $row_range['LOGIN TIMESTAMP_1'], 
                                 "horas_logout_agente" => $row_range['LOGOUT TIMESTAMP_1'], 
                                 "tiempo_conexion_agente" => $row_range['LOGIN TIME'], // columna D
                                 "procentaje_conexion_agente" => 0,
-                                "tiempo_descanso_agente" => '', // columna F
-                                "tiempo_entrenamiento_agente" => '', // columna H
-                                "tiempo_reuniones_agente" => '', // columna I
+                                "tiempo_descanso_agente" => '00:00:00', // columna F
+                                "tiempo_entrenamiento_agente" => '00:00:00', // columna H
+                                "tiempo_reuniones_agente" => '00:00:00', // columna I
                                 'id_campania' => $request['id_campania'],
                                 'day_register' => $request['day_register'],
                         ];

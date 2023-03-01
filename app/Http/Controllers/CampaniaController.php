@@ -205,19 +205,24 @@ class CampaniaController extends Controller
 
         $id_usuario_registro = $request->get('id_usuario_registro');
         $id_type_origin = $request->get('id_type_origin');
-        $id_campania = $request->get('id_campania');;
+        $id_campania = $request->get('id_campania');
+        $firstDay = $request->get('firstDay');
+        $lastDay = $request->get('lastDay');
+        $mountActuality = $request->get('mountActuality');
+
         $data = DB::table('agent_hours')
-        ->select('agent_hours.created_at as fecha', DB::raw("count('agent_hours.created_at') as total"), DB::raw("TIME_FORMAT(SEC_TO_TIME(SUM(TIME_TO_SEC(agent_hours.tiempo_conexion_agente))), '%H:%i:%s') as tiempo_total"))
+        ->select('agent_hours.day_register as fecha', DB::raw("count('agent_hours.created_at') as total"), DB::raw("TIME_FORMAT(SEC_TO_TIME(SUM(TIME_TO_SEC(agent_hours.tiempo_conexion_agente))), '%H:%i:%s') as tiempo_total"))
         ->where('agent_hours.tipo_fuente', '=', $id_type_origin)
         ->where('agent_hours.id_usuario_registro', '=', $id_usuario_registro)
         ->where('agent_hours.id_campania', '=', $id_campania)
-        ->groupBy('agent_hours.created_at')
+        ->whereBetween('day_register', [$firstDay, $lastDay])
+        ->groupBy('agent_hours.day_register')
         ->get();
 
         $datos_configuracion = DB::table('campania_configuracion_por_mes')
         ->select('*')
-        ->where('id_campania', '=', 3)
-        ->where('id_mes', '=', 4)
+        ->where('id_campania', '=', $id_campania)
+        ->where('id_mes', '=',$mountActuality)
         ->get()[0];
 
 
