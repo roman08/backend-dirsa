@@ -60,6 +60,7 @@ class CampaniaController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Campaña creada correctamente',
+            'data' => $campania->id
         ], 200);
     }
 
@@ -210,33 +211,45 @@ class CampaniaController extends Controller
         $lastDay = $request->get('lastDay');
         $mountActuality = $request->get('mountActuality');
 
-        $data = DB::table('agent_hours')
-        ->select('agent_hours.day_register as fecha', DB::raw("count('agent_hours.created_at') as total"), DB::raw("TIME_FORMAT(SEC_TO_TIME(SUM(TIME_TO_SEC(agent_hours.tiempo_conexion_agente))), '%H:%i:%s') as tiempo_total"))
-        ->where('agent_hours.tipo_fuente', '=', $id_type_origin)
-        ->where('agent_hours.id_usuario_registro', '=', $id_usuario_registro)
-        ->where('agent_hours.id_campania', '=', $id_campania)
-        ->whereBetween('day_register', [$firstDay, $lastDay])
-        ->groupBy('agent_hours.day_register')
-        ->get();
+        try {
+            $data = DB::table('agent_hours')
+            ->select('agent_hours.day_register as fecha', DB::raw("count('agent_hours.created_at') as total"), DB::raw("TIME_FORMAT(SEC_TO_TIME(SUM(TIME_TO_SEC(agent_hours.tiempo_conexion_agente))), '%H:%i:%s') as tiempo_total"))
+            ->where('agent_hours.tipo_fuente', '=', $id_type_origin)
+            ->where('agent_hours.id_usuario_registro', '=', $id_usuario_registro)
+            ->where('agent_hours.id_campania', '=', $id_campania)
+            ->whereBetween('day_register', [$firstDay, $lastDay])
+            ->groupBy('agent_hours.day_register')
+            ->get();
 
-        $datos_configuracion = DB::table('campania_configuracion_por_mes')
-        ->select('*')
-        ->where('id_campania', '=', $id_campania)
-        ->where('id_mes', '=',$mountActuality)
-        ->get()[0];
+            $datos_configuracion = DB::table('campania_configuracion_por_mes')
+            ->select('*')
+            ->where('id_campania', '=', $id_campania)
+            ->where('id_mes', '=',$mountActuality)
+            ->get()[0];
 
 
-        $respuesta = [
-            'respuesta' => $datos_configuracion,
-            'data' => $data,
-            'id_type_origin' => $id_type_origin
-        ];
+            $respuesta = [
+                'respuesta' => $datos_configuracion,
+                'data' => $data,
+                'id_type_origin' => $id_type_origin
+            ];
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Campaña actualizada correctamente.',
-            'data' => $respuesta
-        ], 200); 
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Campaña actualizada correctamente.',
+                'data' => $respuesta
+            ], 200); 
+        } catch(\Exception $e) {
+            $msg = ($e->getMessage() == 'Undefined offset: 0') ? 'La campaña no tiene configurado el mes actual' : 'Error interno, favor de contactar al administrado';
+
+            
+            return response()->json([
+                'status' => 'error',
+                'message' => $msg,
+                'data'  => $e->getMessage()
+            ], 200); 
+        }
+ 
     }
 
 

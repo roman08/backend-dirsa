@@ -46,7 +46,7 @@ class CoachController extends Controller
                 'status' => 'success',
                 'repuesta' => $entrenador,
             ],200);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'error' => 'error'], 200);
         }
         
@@ -64,7 +64,7 @@ class CoachController extends Controller
                 'status' => 'success',
                 'repuesta' => $entrenador,
             ],200);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'error' => 'error'], 200);
         }
     }
