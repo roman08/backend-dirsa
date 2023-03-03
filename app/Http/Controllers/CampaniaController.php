@@ -253,9 +253,10 @@ class CampaniaController extends Controller
     }
 
 
-    public function get_hours_admin(){
+    public function get_hours_admin(Request $request){
 
-        $respuesta = DB::select('CALL get_hours_admin()');
+        $mounth = $request->get('mounth');
+        $respuesta = DB::select('CALL get_hours_admin_param(?)',[$mounth]);
 
 
         return response()->json([
@@ -278,10 +279,10 @@ class CampaniaController extends Controller
 
 
         $respuesta = DB::table('agent_hours')
-        ->select(DB::raw("count('day_register')", 'nombre_completo_agente'))
+        ->select(DB::raw("count('day_register') as total_days"), 'nombre_completo_agente', 'numero_empleado')
         ->whereBetween('day_register',[$firstDay, $lastDay])
         ->where('id_campania','=',$id_campania)
-        ->groupBy('nombre_completo_agente')
+        ->groupBy('nombre_completo_agente', 'numero_empleado')
         ->get();
 
         return response()->json([
