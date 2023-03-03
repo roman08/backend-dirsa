@@ -25,7 +25,7 @@ class GeneralController extends Controller
 
         $id = $request->get('id');
 
-        $agents = User::select('id', 'nombre_completo')->where('id_puesto', '=', $id)->orderBy('nombre_completo', 'ASC')->get();
+        $agents = User::select('id', 'nombre_completo', 'numero_empleado')->where('id_puesto', '=', $id)->orderBy('nombre_completo', 'ASC')->get();
 
         return response()->json([
                 'status' => 'success',

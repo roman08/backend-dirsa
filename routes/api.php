@@ -36,6 +36,7 @@ Route::post('/send-mail', [AuthController::class, 'sendEmail']);
 
 // ROUTES GROUP
 Route::get('/get-groups', [GroupController::class, 'getGroups']);
+Route::get('/getGroupFilter', [GroupController::class, 'getGroupFilter']);
 Route::post('/create-group', [GroupController::class, 'createGroup']);
 Route::get('/grupo/delete', [GroupController::class, 'delete']);
 Route::get('/grupo/getById', [GroupController::class, 'getById']);
@@ -58,11 +59,11 @@ Route::get('/campanias/getById', [CampaniaController::class, 'getById']);
 Route::post('/campania/update', [CampaniaController::class, 'update']);
 Route::get('/campanias/getCampaniaAgent', [CampaniaController::class, 'getCampaniaAgent']);
 Route::get('/campanias/getHoursAdmin', [CampaniaController::class, 'get_hours_admin']);
+Route::get('/campanias/getAgentsDanger', [CampaniaController::class, 'getAgentsDanger']);
 
 //  ROUTES CONTROL HORAS
 Route::post('/checkHours/importData', [CheckHoursController::class, 'importData']);
 Route::post('/checkHours/loadJson', [CheckHoursController::class, 'loadJson']);
-
 //  ROUTES 
 Route::get('/leader/campanias', [LeaderContoller::class, 'getCampaniasLeader']);
 

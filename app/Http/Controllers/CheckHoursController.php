@@ -17,7 +17,7 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use App\Http\Requests\MultipartFormRequest;
 use App\Http\Resources\MultipartFormResource;
 
-
+use App\Models\Campania;
 use App\Models\AgentHours;
 class CheckHoursController extends Controller
 {
@@ -128,8 +128,8 @@ class CheckHoursController extends Controller
                 'data' => $data
             ]);
         //    DB::table('tbl_customer')->insert($data);
-       } catch (Exception $e) {
-           $error_code = $e->errorInfo[1];
+       } catch (\Exception $e) {
+           $error_code = $e->getMessage();
             return response()->json([
                 'msg' =>' Datos',
                 'data' => $error_code
@@ -144,6 +144,8 @@ class CheckHoursController extends Controller
     $tipo_fuente = $request['tipo_fuente'];
     $data = array();
     $datos = json_decode($request['data'], true, 512, JSON_THROW_ON_ERROR);
+    $id_campania =  $request['id_campania'];
+    
 
     try {
             switch ($tipo_fuente) {
@@ -154,30 +156,38 @@ class CheckHoursController extends Controller
                     
 
                     foreach ( $datos as $dato) {
-                        $hour_system = (!empty($dato['System Hrs to Away from Desk %']) ? $dato['System Hrs to Away from Desk %'] : null );
-                        $hour_system_final = ( !empty($hour_system) ) ? substr($hour_system, 0, -1) : 0;
-                        
-                        $data = [
-                            "id_usuario_registro" => $request['user_id'],
-                            "tipo_fuente" => $request['tipo_fuente'],
-                            "numero_empleado" => $dato['No empleado'],
-                            "nombre_completo_agente" =>  $dato['DisplayName'],
-                            "agente_nombre" =>  '',
-                            "agente_paterno" => '',
-                            "agente_materno" => '',
-                            "email_agente_fuente" => '',
-                            "horas_sistema_agente" => $dato['System Hrs Formato HR'], // columna C
-                            "horas_login_agente" => '', 
-                            "horas_logout_agente" => '', 
-                            "tiempo_conexion_agente" =>  $dato['AFD Formato HR'],
-                            "procentaje_conexion_agente" =>  $hour_system_final ,
-                            "tiempo_descanso_agente" =>  $dato['30 Minute Break Formato HR'],
-                            "tiempo_entrenamiento_agente" =>  $dato['Program Training Formato HR'],
-                            "tiempo_reuniones_agente" =>  $dato['Meeting-Supervisor Formato HR'],
-                            
-                        ];
-                    
-                        AgentHours::create($data);
+
+
+                        // validar usuario en el grupo de la campaña
+                        $num_empleado = $dato['No empleado'];
+                        if($this->validateUser($id_campania, $num_empleado)){
+                            $hour_system = (!empty($dato['System Hrs to Away from Desk %']) ? $dato['System Hrs to Away from Desk %'] : null);
+                            $hour_system_final = (!empty($hour_system)) ? substr($hour_system, 0, -1) : 0;
+
+                            $data = [
+                                "id_usuario_registro" => $request['user_id'],
+                                "tipo_fuente" => $request['tipo_fuente'],
+                                "numero_empleado" => $dato['No empleado'],
+                                "nombre_completo_agente" =>  $dato['DisplayName'],
+                                "agente_nombre" =>  '',
+                                "agente_paterno" => '',
+                                "agente_materno" => '',
+                                "email_agente_fuente" => '',
+                                "horas_sistema_agente" => $dato['System Hrs Formato HR'], // columna C
+                                "horas_login_agente" => '',
+                                "horas_logout_agente" => '',
+                                "tiempo_conexion_agente" =>  $dato['AFD Formato HR'],
+                                "procentaje_conexion_agente" =>  $hour_system_final,
+                                "tiempo_descanso_agente" =>  $dato['30 Minute Break Formato HR'],
+                                "tiempo_entrenamiento_agente" =>  $dato['Program Training Formato HR'],
+                                "tiempo_reuniones_agente" =>  $dato['Meeting-Supervisor Formato HR'],
+                                'id_campania' => $request['id_campania'],
+                                'day_register' => $request['day_register'],
+                            ];
+
+                            AgentHours::create($data);
+                        }
+                       
                     }
 
                     break;
@@ -220,10 +230,10 @@ class CheckHoursController extends Controller
             return response()->json([
                 'status' => 'success',
                 'msg' =>' Datos guardados correctamente.',
-                'data' => $datos
+                'data' => $data
             ]);
-        } catch (Exception $e) {
-            $error_code = $e->errorInfo[1];
+        } catch (\Exception $e) {
+            $error_code = $e->getMessage();
             return response()->json([
                 'status' => 'error',
                 'msg' =>' Datos',
@@ -232,6 +242,22 @@ class CheckHoursController extends Controller
         //    return back()->withErrors('There was a problem uploading the data!');
         }
   
+   }
+
+
+   public function validateUser($id_campania, $num_empleado){
+        // DB::table('campanias')
+        // ->select('grupo_usuarios.id_usuario')
+        // ->join('campania_grupo_agentes', 'campania_grupo_agentes.id_campania', '=', 'campanias.id')
+        // ->join('grupo_usuarios', 'grupo_usuarios.id_grupo', '=', 'campania_grupo_agentes.id_grupo')
+        // ->where('campanias.id', '=', $id_campania)
+        // ->get();
+
+        $campania = Campania::with('groups.agentes')->where('id', '=', $id_campania)->get()[0];
+        $agentes = $campania->groups[0]->agentes;
+
+        return ($agentes->contains('numero_empleado', $num_empleado)) ? true : false;
+
    }
 
 }

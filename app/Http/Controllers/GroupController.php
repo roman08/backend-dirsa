@@ -6,8 +6,7 @@ use Illuminate\Http\Request;
 
 use App\Models\Grupo;
 use App\Models\GrupoUsuario;
-use DateTime;
-use PHPUnit\TextUI\XmlConfiguration\Group;
+use Illuminate\Support\Facades\DB;
 
 class GroupController extends Controller
 {
@@ -115,6 +114,21 @@ class GroupController extends Controller
             'status' => 'success',
             'message' => 'Grupo actualizado correctamente',
             'data' => $group
+        ], 200);
+    }
+
+    public function getGroupFilter(){
+         $groups = DB::table('grupos')->select('*')
+            ->whereNotIn('id',(function ($query) {
+	            $query->from('grupo_usuarios')
+		            ->select('grupo_usuarios.id_grupo');
+                }))
+        ->get();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Grupos obtenidos correctamente',
+            'data' => $groups
         ], 200);
     }
 }

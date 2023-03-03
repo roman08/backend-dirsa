@@ -264,4 +264,30 @@ class CampaniaController extends Controller
             'data' => $respuesta
         ], 200); 
     }
+
+    public function getAgentsDanger(Request $request){
+
+        $firstDay = $request->get('firstDay');
+        $lastDay = $request->get('lastDay');
+        $id_campania = $request->get('id_campania');
+        // $respuesta = DB::table('agent_hours')
+        // ->select(DB::raw("count('day_register')", 'nombre_completo_agente'))
+        // ->whereBetween('day_register', [$firstDay, $lastDay])
+        // ->groupBy('nombre_completo_agente')
+        // ->get();
+
+
+        $respuesta = DB::table('agent_hours')
+        ->select(DB::raw("count('day_register')", 'nombre_completo_agente'))
+        ->whereBetween('day_register',[$firstDay, $lastDay])
+        ->where('id_campania','=',$id_campania)
+        ->groupBy('nombre_completo_agente')
+        ->get();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Datos obtenidos correctamente.',
+            'data' => $respuesta
+        ], 200); 
+    }
 }
