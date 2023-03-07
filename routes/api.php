@@ -41,12 +41,15 @@ Route::post('/create-group', [GroupController::class, 'createGroup']);
 Route::get('/grupo/delete', [GroupController::class, 'delete']);
 Route::get('/grupo/getById', [GroupController::class, 'getById']);
 Route::post('/grupo/update', [GroupController::class, 'update']);
+
 // ROUTES GENERALES
 Route::get('/agents/all', [GeneralController::class, 'getAllAgents']);
 Route::get('/agents', [GeneralController::class, 'getAgents']);
 Route::get('/typePays', [GeneralController::class, 'getTypePays']);
 Route::get('/leaders', [GeneralController::class, 'getLeaders']);
 Route::get('/origins', [GeneralController::class, 'getTypeOrigins']);
+Route::get('/agents/detail', [GeneralController::class, 'agentDetail']);
+
 
 
 // ROUTES CAMPAÑAS 
@@ -66,7 +69,6 @@ Route::post('/checkHours/importData', [CheckHoursController::class, 'importData'
 Route::post('/checkHours/loadJson', [CheckHoursController::class, 'loadJson']);
 //  ROUTES 
 Route::get('/leader/campanias', [LeaderContoller::class, 'getCampaniasLeader']);
-
 
 // TODO: RUTAS ENTRENADOR
 Route::get('/obtenerEntrenadores', [CoachController::class, 'index'])->middleware('auth:sanctum');

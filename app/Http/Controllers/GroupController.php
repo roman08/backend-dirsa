@@ -118,11 +118,12 @@ class GroupController extends Controller
     }
 
     public function getGroupFilter(){
-         $groups = DB::table('grupos')->select('*')
-            ->whereNotIn('id',(function ($query) {
-	            $query->from('grupo_usuarios')
-		            ->select('grupo_usuarios.id_grupo');
-                }))
+         $groups = DB::table('grupos')
+        ->select('*')
+        ->whereNotIn('id',(function ($query) {
+            $query->from('campania_grupo_agentes')
+                ->select('id');
+        }))
         ->get();
 
         return response()->json([

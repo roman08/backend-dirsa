@@ -13,7 +13,7 @@ class GeneralController extends Controller
 {
 
     public function getAllAgents(){
-        $agents = User::where('id_puesto', '=', 1)->orWhere('id_puesto', '=', 2)->orderBy('nombre_completo', 'ASC')->paginate(10);
+        $agents = User::with('campanias')->where('id_puesto', '=', 1)->orWhere('id_puesto', '=', 2)->orderBy('nombre_completo', 'ASC')->paginate(10);
         return response()->json([
             'status' => 'success',
             'message' => 'Agentes obtenidos correctamente',
@@ -67,6 +67,18 @@ class GeneralController extends Controller
             'data' => $origins
         ], 200);
 
+    }
+
+
+    public function agentDetail( Request $request){
+        $id = $request->get('id');
+        $agent = User::with('campanias')->find($id);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Agentes obtenidos correctamente',
+            'data' => $agent
+        ], 200);
     }
 
 }
