@@ -14,6 +14,7 @@ use App\Http\Resources\MultipartFormResource;
 use App\Models\Campania;
 use App\Models\AgentHours;
 use App\Models\User;
+use Illuminate\Support\Arr;
 use PhpOffice\PhpSpreadsheet\Reader\Xls\RC4;
 
 class CheckHoursController extends Controller
@@ -195,24 +196,36 @@ class CheckHoursController extends Controller
 
                     break;
                 case 2:
-                    foreach ( $datos as $dato ) {
-                        $userNotValid = [];
-                        $num_empleado = $dato['No empleado'];
+                    $userNotValid = array();
+                   
+                    $productosAgrupados = collect($datos)->groupBy('NO EMPLEADO');
+
+                    foreach ($productosAgrupados as $dato ) {
+                        $horas = array();
+                        $agente = $dato[0];
+                        $num_empleado = $agente['NO EMPLEADO'];
                         if ($this->existUser($num_empleado)) {
                             if ($this->validateUser($id_campania, $num_empleado)) {
+                                foreach ($dato as $d) {
+                                    array_push($horas, $d['LOGIN TIME']);
+                                }
+                                $total_s = array_reduce($horas, function ($carry, $time) {
+                                    return $carry + strtotime("1970-01-01 $time UTC");
+                                });
+                                $totalT = gmdate("H:i:s", $total_s);
                                 $data = [
                                     "id_usuario_registro" => $request['user_id'],
                                     "tipo_fuente" => $tipo_fuente,
-                                    "numero_empleado" => $dato['NO EMPLEADO'],
-                                    "nombre_completo_agente" => $dato['AGENT FIRST NAME'] . ' ' . $dato['AGENT LAST NAME'],
-                                    "agente_nombre" =>  $dato['AGENT FIRST NAME'],
-                                    "agente_paterno" => $dato['AGENT LAST NAME'],
+                                    "numero_empleado" => $agente['NO EMPLEADO'],
+                                    "nombre_completo_agente" => $agente['AGENT FIRST NAME'] . ' ' . $agente['AGENT LAST NAME'],
+                                    "agente_nombre" =>  $agente['AGENT FIRST NAME'],
+                                    "agente_paterno" => $agente['AGENT LAST NAME'],
                                     "agente_materno" => '',
-                                    "email_agente_fuente" => $dato['AGENT'],
+                                    "email_agente_fuente" => $agente['AGENT'],
                                     "horas_sistema_agente" => '00:00:00', // columna C
-                                    "horas_login_agente" => $dato['LOGIN TIMESTAMP_1'],
-                                    "horas_logout_agente" => $dato['LOGOUT TIMESTAMP_1'],
-                                    "tiempo_conexion_agente" => $dato['LOGIN TIME'], // columna D
+                                    "horas_login_agente" => $agente['LOGIN TIMESTAMP_1'],
+                                    "horas_logout_agente" => $agente['LOGOUT TIMESTAMP_1'],
+                                    "tiempo_conexion_agente" => $totalT, // columna D
                                     "procentaje_conexion_agente" => 0,
                                     "tiempo_descanso_agente" => '00:00:00', // columna F
                                     "tiempo_entrenamiento_agente" => '00:00:00', // columna H
@@ -220,13 +233,13 @@ class CheckHoursController extends Controller
                                     'id_campania' => $request['id_campania'],
                                     'day_register' => $request['day_register'],
                                 ];
+                               
                                 AgentHours::create($data);
                             }
                             
                         } else {
-                            array_push($userNotValid, $dato);
+                            array_push($userNotValid, $agente);
                         }
-                        
                     }
                     break;
                 default:
@@ -243,8 +256,9 @@ class CheckHoursController extends Controller
             return response()->json([
                 'status' => 'success',
                 'msg' =>' Datos guardados correctamente.',
-                'data' => $data,
-                'userNoValid' => $userNotValid
+                'data' => $datos,
+                'userNoValid' => $userNotValid,
+                'times' => $productosAgrupados
             ]);
         } catch (\Exception $e) {
             $error_code = $e->getMessage();

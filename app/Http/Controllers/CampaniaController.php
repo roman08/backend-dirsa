@@ -291,4 +291,17 @@ class CampaniaController extends Controller
             'data' => $respuesta
         ], 200); 
     }
+
+    public function getMonthsCampania( Request $request){
+        $id = $request->get('id');
+
+        $months = CampaniaConfiguracionPorMes::where('id_campania', '=', $id)->get();
+
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Datos obtenidos correctamente.',
+            'data' => $months
+        ], 200);
+    }
 }

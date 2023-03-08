@@ -63,6 +63,7 @@ Route::post('/campania/update', [CampaniaController::class, 'update']);
 Route::get('/campanias/getCampaniaAgent', [CampaniaController::class, 'getCampaniaAgent']);
 Route::get('/campanias/getHoursAdmin', [CampaniaController::class, 'get_hours_admin']);
 Route::get('/campanias/getAgentsDanger', [CampaniaController::class, 'getAgentsDanger']);
+Route::get('/campanias/getMonthsCampania', [CampaniaController::class, 'getMonthsCampania']);
 
 //  ROUTES CONTROL HORAS
 Route::post('/checkHours/importData', [CheckHoursController::class, 'importData']);

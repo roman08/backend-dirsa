@@ -33,30 +33,45 @@ class GroupController extends Controller
         ]);
 
 
-        //se crea el usuario en la base de datos
-        $group = Grupo::create([
-            'nombre' => $validatedData['nombre'],
-            'estatus' => $validatedData['estatus'],
-            'id_tipo_agente' => $validatedData['id_tipo_agente'],
-        ]);
-
-        
-
-        // $agents = json_decode($validatedData['agents']);
-        foreach ($validatedData['agents'] as $value) {
-            $user = GrupoUsuario::create([
-                'id_usuario' => $value,
-                'id_grupo' => $group->id,
-                'fecha_ingreso' => $datetime,
-                'fecha_salida' => $datetime 
+        try {
+            //se crea el usuario en la base de datos
+            $group = Grupo::create([
+                'nombre' => $validatedData['nombre'],
+                'estatus' => $validatedData['estatus'],
+                'id_tipo_agente' => $validatedData['id_tipo_agente'],
             ]);
-        }
-        
 
-        return response()->json([
+            foreach ($validatedData['agents'] as $value) {
+                $user = GrupoUsuario::create([
+                    'id_usuario' => $value,
+                    'id_grupo' => $group->id,
+                    'fecha_ingreso' => $datetime,
+                    'fecha_salida' => $datetime
+                ]);
+            }
+            return
+             response()->json([
                 'status' => 'success',
                 'message' => 'Grupo creado correctamente',
             ], 200);
+
+        } catch (\Exception $e) {
+            $error_code = $e->getMessage();
+            return response()->json([
+                'status' => 'error',
+                'msg' =>' Datos',
+                'data' => $error_code
+            ]);
+        //    return back()->withErrors('There was a problem uploading the data!');
+        }
+        
+        
+       
+        
+
+
+
+        
     }
 
     public function delete(Request $request) {
