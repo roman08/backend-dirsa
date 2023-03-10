@@ -304,4 +304,38 @@ class CampaniaController extends Controller
             'data' => $months
         ], 200);
     }
+
+
+    public function get_hours_supervisor(Request $request)
+    {
+
+        $mounth = $request->get('mounth');
+        $id = $request->get('id');
+        $respuesta = DB::select('CALL get_hours_admin_fillter(?, ?)', [$mounth, $id]);
+
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Datos obtenidos correctamente.',
+            'data' => $respuesta
+        ], 200);
+    }
+
+
+
+    public function getMonthCampania(Request $request)
+    {
+        $id = $request->get('id');
+        $month =
+        $request->get('month');
+
+        $months = CampaniaConfiguracionPorMes::where('id_campania', '=', $id)->where('id_mes', '=', $month)->get();
+
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Datos obtenidos correctamente.',
+            'data' => $months
+        ], 200);
+    }
 }
