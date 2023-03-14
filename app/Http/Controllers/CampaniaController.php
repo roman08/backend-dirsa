@@ -338,4 +338,20 @@ class CampaniaController extends Controller
             'data' => $months
         ], 200);
     }
+
+    public function get_data_grafica(Request $request)
+    {
+
+        $id = $request->get('id');
+        $respuesta = DB::select('CALL hours_campanias_param( ?)', [ $id]);
+
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Datos obtenidos correctamente.',
+            'data' => $respuesta
+        ], 200);
+    }
+
+    
 }
