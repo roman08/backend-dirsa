@@ -258,7 +258,7 @@ class CheckHoursController extends Controller
                 'msg' =>' Datos guardados correctamente.',
                 'data' => $datos,
                 'userNoValid' => $userNotValid,
-                'times' => $productosAgrupados
+                // 'times' => $productosAgrupados
             ]);
         } catch (\Exception $e) {
             $error_code = $e->getMessage();

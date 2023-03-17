@@ -67,7 +67,7 @@ Route::get('/campanias/getAgentsDanger', [CampaniaController::class, 'getAgentsD
 Route::get('/campanias/getMonthsCampania', [CampaniaController::class, 'getMonthsCampania']);
 Route::get('/campanias/getMonthCampania', [CampaniaController::class, 'getMonthCampania']);
 Route::get('/campanias/getDataGrafica', [CampaniaController::class, 'get_data_grafica']);
-
+Route::get('/campanias/getAgentsMonth', [CampaniaController::class, 'get_agents_month']);
 //  ROUTES CONTROL HORAS
 Route::post('/checkHours/importData', [CheckHoursController::class, 'importData']);
 Route::post('/checkHours/loadJson', [CheckHoursController::class, 'loadJson']);

@@ -8,7 +8,7 @@ use App\Models\Campania;
 use App\Models\CampaniaGrupoAgentes;
 use App\Models\CampaniaSupervisor;
 use App\Models\CampaniaConfiguracionPorMes;
-
+use App\Models\AgentHours;
 use Illuminate\Support\Facades\DB;
 
 class CampaniaController extends Controller
@@ -24,7 +24,7 @@ class CampaniaController extends Controller
             'id_supervisor' => '',
             'id_grupo' => '',
             'id_type_origin' => '',
-            
+
 
         ]);
 
@@ -37,7 +37,7 @@ class CampaniaController extends Controller
             'bilingue' => $validatedData['bilingue'],
             'id_forma_de_pago' => $validatedData['id_forma_de_pago'],
             'id_type_origin' => $validatedData['id_type_origin'],
-            
+
 
         ]);
 
@@ -137,7 +137,8 @@ class CampaniaController extends Controller
         ], 200);
     }
 
-    public function delete(Request $request){
+    public function delete(Request $request)
+    {
 
         $id = $request->get('id');
         try {
@@ -159,27 +160,26 @@ class CampaniaController extends Controller
                 'data' => $error_code
             ]);
         }
- 
     }
 
-    public function update( Request $request){
+    public function update(Request $request)
+    {
 
         $id = $request['id'];
         $campania = Campania::find($id);
 
-       
+
         $campania->bilingue = $request['bilingue'];
         $campania->fecha_creacion = $request['fecha_creacion'];
         $campania->nombre =  $request['nombre'];
         $campania->id_forma_de_pago = $request['id_forma_de_pago'];
-
-
+        $campania->id_type_origin = $request['id_type_origin'];
         $campania->save();
 
-       
+
         $cs = CampaniaSupervisor::where('id_campania', $id)->delete();
-        
-        
+
+
 
         CampaniaSupervisor::create([
             'id_campania' => $campania->id,
@@ -187,7 +187,7 @@ class CampaniaController extends Controller
         ]);
 
         $ca = CampaniaGrupoAgentes::where('id_campania', $id)->delete();
-        
+
         CampaniaGrupoAgentes::create([
             'id_campania' => $campania->id,
             'id_grupo' => $request['id_grupo'],
@@ -198,11 +198,12 @@ class CampaniaController extends Controller
             'status' => 'success',
             'message' => 'Campaña actualizada correctamente.',
             'data' => $request['id']
-        ], 200); 
+        ], 200);
     }
 
 
-    public function getCampaniaAgent( Request $request){
+    public function getCampaniaAgent(Request $request)
+    {
 
         $id_usuario_registro = $request->get('id_usuario_registro');
         $id_type_origin = $request->get('id_type_origin');
@@ -213,19 +214,19 @@ class CampaniaController extends Controller
 
         try {
             $data = DB::table('agent_hours')
-            ->select('agent_hours.day_register as fecha', DB::raw("count('agent_hours.created_at') as total"), DB::raw("TIME_FORMAT(SEC_TO_TIME(SUM(TIME_TO_SEC(agent_hours.tiempo_conexion_agente))), '%H:%i:%s') as tiempo_total"))
-            ->where('agent_hours.tipo_fuente', '=', $id_type_origin)
-            ->where('agent_hours.id_usuario_registro', '=', $id_usuario_registro)
-            ->where('agent_hours.id_campania', '=', $id_campania)
-            ->whereBetween('day_register', [$firstDay, $lastDay])
-            ->groupBy('agent_hours.day_register')
-            ->get();
+                ->select( 'agent_hours.day_register as fecha', DB::raw("count('agent_hours.created_at') as total"), DB::raw("TIME_FORMAT(SEC_TO_TIME(SUM(TIME_TO_SEC(agent_hours.tiempo_conexion_agente))), '%H:%i:%s') as tiempo_total"))
+                ->where('agent_hours.tipo_fuente', '=', $id_type_origin)
+                ->where('agent_hours.id_usuario_registro', '=', $id_usuario_registro)
+                ->where('agent_hours.id_campania', '=', $id_campania)
+                ->whereBetween('day_register', [$firstDay, $lastDay])
+                ->groupBy('agent_hours.day_register')
+                ->get();
 
             $datos_configuracion = DB::table('campania_configuracion_por_mes')
-            ->select('*')
-            ->where('id_campania', '=', $id_campania)
-            ->where('id_mes', '=',$mountActuality)
-            ->get()[0];
+                ->select('*')
+                ->where('id_campania', '=', $id_campania)
+                ->where('id_mes', '=', $mountActuality)
+                ->get()[0];
 
 
             $respuesta = [
@@ -238,35 +239,36 @@ class CampaniaController extends Controller
                 'status' => 'success',
                 'message' => 'Campaña actualizada correctamente.',
                 'data' => $respuesta
-            ], 200); 
-        } catch(\Exception $e) {
+            ], 200);
+        } catch (\Exception $e) {
             $msg = ($e->getMessage() == 'Undefined offset: 0') ? 'La campaña no tiene configurado el mes actual' : 'Error interno, favor de contactar al administrado';
 
-            
+
             return response()->json([
                 'status' => 'error',
                 'message' => $msg,
                 'data'  => $e->getMessage()
-            ], 200); 
+            ], 200);
         }
- 
     }
 
 
-    public function get_hours_admin(Request $request){
+    public function get_hours_admin(Request $request)
+    {
 
         $mounth = $request->get('mounth');
-        $respuesta = DB::select('CALL get_hours_admin_param(?)',[$mounth]);
+        $respuesta = DB::select('CALL get_hours_admin_param(?)', [$mounth]);
 
 
         return response()->json([
             'status' => 'success',
             'message' => 'Datos obtenidos correctamente.',
             'data' => $respuesta
-        ], 200); 
+        ], 200);
     }
 
-    public function getAgentsDanger(Request $request){
+    public function getAgentsDanger(Request $request)
+    {
 
         $firstDay = $request->get('firstDay');
         $lastDay = $request->get('lastDay');
@@ -279,20 +281,21 @@ class CampaniaController extends Controller
 
 
         $respuesta = DB::table('agent_hours')
-        ->select(DB::raw("count('day_register') as total_days"), 'nombre_completo_agente', 'numero_empleado')
-        ->whereBetween('day_register',[$firstDay, $lastDay])
-        ->where('id_campania','=',$id_campania)
-        ->groupBy('nombre_completo_agente', 'numero_empleado')
-        ->get();
+            ->select(DB::raw("count('day_register') as total_days"), 'nombre_completo_agente', 'numero_empleado')
+            ->whereBetween('day_register', [$firstDay, $lastDay])
+            ->where('id_campania', '=', $id_campania)
+            ->groupBy('nombre_completo_agente', 'numero_empleado')
+            ->get();
 
         return response()->json([
             'status' => 'success',
             'message' => 'Datos obtenidos correctamente.',
             'data' => $respuesta
-        ], 200); 
+        ], 200);
     }
 
-    public function getMonthsCampania( Request $request){
+    public function getMonthsCampania(Request $request)
+    {
         $id = $request->get('id');
 
         $months = CampaniaConfiguracionPorMes::where('id_campania', '=', $id)->get();
@@ -327,7 +330,7 @@ class CampaniaController extends Controller
     {
         $id = $request->get('id');
         $month =
-        $request->get('month');
+            $request->get('month');
 
         $months = CampaniaConfiguracionPorMes::where('id_campania', '=', $id)->where('id_mes', '=', $month)->get();
 
@@ -343,7 +346,9 @@ class CampaniaController extends Controller
     {
 
         $id = $request->get('id');
-        $respuesta = DB::select('CALL hours_campanias_param( ?)', [ $id]);
+        $respuesta = DB::select('CALL hours_campanias_grafica(?)', [$id]);
+
+
 
 
         return response()->json([
@@ -353,5 +358,31 @@ class CampaniaController extends Controller
         ], 200);
     }
 
-    
+    public function get_agents_month(Request $request)
+    {
+        $id_campania =
+            $request->get('id');
+        $day =
+            $request->get('day_register');
+
+        $mes =
+        $request->get('mes');
+        $agents = AgentHours::where('id_campania', '=', $id_campania)->where('day_register', '=', $day)->get();
+
+
+        $datos_configuracion = DB::table('campania_configuracion_por_mes')
+        ->select('*')
+            ->where('id_campania', '=', $id_campania)
+            ->where('id_mes', '=', $mes)
+            ->get()[0];
+
+
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Datos obtenidos correctamente.',
+            'data' => $agents,
+            'configuracion' => $datos_configuracion
+        ], 200);
+    }
 }
