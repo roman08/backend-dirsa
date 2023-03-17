@@ -10,6 +10,8 @@ use App\Models\CampaniaSupervisor;
 use App\Models\CampaniaConfiguracionPorMes;
 use App\Models\AgentHours;
 use Illuminate\Support\Facades\DB;
+use Carbon\CarbonInterval;
+use Carbon\Carbon;
 
 class CampaniaController extends Controller
 {
@@ -314,13 +316,58 @@ class CampaniaController extends Controller
 
         $mounth = $request->get('mounth');
         $id = $request->get('id');
-        $respuesta = DB::select('CALL get_hours_admin_fillter(?, ?)', [$mounth, $id]);
+        $idCampania =
+        $request->get('idCampania');
+        // $respuesta = DB::select('CALL get_hours_admin_fillter(?, ?)', [$mounth, $id]);
+        $times = DB::select('CALL get_hours_supervisor(?, ?)', [$mounth, $idCampania]);
+        $horas =  array();
+        foreach ($times as $key) {
+            array_push($horas, $key->tiempo_conexion_agente);
+        }
+        // Crea el acumulador con el valor inicial de 0 horas
+        $totalHoras = CarbonInterval::hours(0);
+
+        // Recorre el arreglo de tiempos y agrega cada tiempo al acumulador
+        foreach ($horas as $hora) {
+            $intervalo = CarbonInterval::createFromFormat('H:i:s', $hora);
+            $totalHoras->add($intervalo);
+        }
+
+        $users =
+        DB::table('campania_grupo_agentes')
+        ->select('campania_grupo_agentes.id_grupo', DB::raw("COUNT('grupo_usuarios.id_grupo') as tot_agents1"))
+        ->join('grupo_usuarios', 'grupo_usuarios.id_grupo', '=', 'campania_grupo_agentes.id_grupo')
+        ->where('campania_grupo_agentes.id_campania', '=', $idCampania)
+        ->groupBy('grupo_usuarios.id_grupo')
+        ->get();
 
 
+
+        // $mounth = $request->get('mounth');
+        // $id = $request->get('id');
+        $hora_final = explode(":", $totalHoras->format('%H:%I:%S'));
+        $minuts = substr($hora_final[1], 0, 2);
+        $secons = substr($hora_final[2], 0, 2);
+
+
+        $hh = $hora_final[0] . ':' . $minuts . ':' . $secons;
+
+
+
+
+
+        $data = [
+            "id_campania" => $times[0]->id,
+            "nombre" => $times[0]->nombre,
+            "estatus" => $times[0]->estatus,
+            "fecha_creacion" => $times[0]->fecha_creacion,
+            "hrs_campania" => $hh,
+            "tot_agents" => $users[0]->tot_agents1,
+        ];
         return response()->json([
             'status' => 'success',
             'message' => 'Datos obtenidos correctamente.',
-            'data' => $respuesta
+            'data' =>  $data
         ], 200);
     }
 
@@ -346,15 +393,65 @@ class CampaniaController extends Controller
     {
 
         $id = $request->get('id');
-        $respuesta = DB::select('CALL hours_campanias_grafica(?)', [$id]);
+        // $respuesta = DB::select('CALL hours_campanias_grafica(?)', [$id]);
+
+        $respuesta = DB::select('CALL get_grafica(?)', [$id]);
+
+        $meses = collect($respuesta)->groupBy('mes');
 
 
+       
+        $horas_f = array();
+        foreach ($meses as $key => $value) {
+            $horas = array();
+           foreach ($value as $data) {
+             array_push($horas, $data->hrs_campania);
+           }
+
+            $totalHoras = CarbonInterval::hours(0);
+
+            // Recorre el arreglo de tiempos y agrega cada tiempo al acumulador
+            foreach ($horas as $hora) {
+                $intervalo = CarbonInterval::createFromFormat('H:i:s', $hora);
+                $totalHoras->add($intervalo);
+            }
+
+            $hora_final = explode(":", $totalHoras->format('%H:%I:%S'));
+            $minuts = substr($hora_final[1], 0, 2);
+            $secons = substr($hora_final[2], 0, 2);
+
+            $horas_f[$key] = $hora_final[0] . ':' . $minuts . ':' . $secons;
+        }
 
 
+        $hora_e = array();
+        foreach ($horas_f as $key => $value) {
+           $time_components = explode(":", $value);
+
+            $hours = intval($time_components[0]);
+            $minutes = intval($time_components[1]);
+            $seconds = intval($time_components[2]);
+
+            $total_seconds = ($hours * 3600) + ($minutes * 60) + $seconds;
+            $total_hours = $total_seconds / 3600;
+
+            $hora_e[$key] = $total_hours;
+        }
+        
+
+
+        $data = [
+            'horas' => collect($horas_f),
+            'hora_grafica' => collect($hora_e)
+        ];
+
+
+        $ccpm = CampaniaConfiguracionPorMes::where('id_campania', '=',$id)->get();
         return response()->json([
             'status' => 'success',
             'message' => 'Datos obtenidos correctamente.',
-            'data' => $respuesta
+            'data' => $data,
+            'ccpm' => $ccpm
         ], 200);
     }
 

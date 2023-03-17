@@ -49,6 +49,7 @@ Route::get('/typePays', [GeneralController::class, 'getTypePays']);
 Route::get('/leaders', [GeneralController::class, 'getLeaders']);
 Route::get('/origins', [GeneralController::class, 'getTypeOrigins']);
 Route::get('/agents/detail', [GeneralController::class, 'agentDetail']);
+Route::get('/test', [GeneralController::class, 'test']);
 
 
 
