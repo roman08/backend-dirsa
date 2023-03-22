@@ -27,7 +27,8 @@ class DatabaseSeeder extends Seeder
             // EjecucionAdministrativaSeeder::class,
             // DepartamentosSeeder::class,
             // TypePaySeeder::class
-            TypeOriginSeeder::class
+            // TypeOriginSeeder::class
+            TypeModuelSeerder::class
         ]);
         // \App\Models\User::factory(10)->create();
     }
