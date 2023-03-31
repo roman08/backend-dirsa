@@ -28,7 +28,8 @@ class DatabaseSeeder extends Seeder
             // DepartamentosSeeder::class,
             // TypePaySeeder::class
             // TypeOriginSeeder::class
-            TypeModuelSeerder::class
+            // TypeModuelSeerder::class
+            ModulesSeeder::class
         ]);
         // \App\Models\User::factory(10)->create();
     }
