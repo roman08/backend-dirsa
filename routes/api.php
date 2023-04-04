@@ -73,7 +73,7 @@ Route::get('/campanias/getAgentsMonth', [CampaniaController::class, 'get_agents_
 Route::post('/checkHours/importData', [CheckHoursController::class, 'importData']);
 Route::post('/checkHours/loadJson', [CheckHoursController::class, 'loadJson']);
 //  ROUTES 
-Route::get('/leader/campasnia', [LeaderContoller::class, 'getCampaniasLeader']);
+Route::get('/leader/campanias', [LeaderContoller::class, 'getCampaniasLeader']);
 
 // TODO: RUTAS ENTRENADOR
 Route::get('/obtenerEntrenadores', [CoachController::class, 'index'])->middleware('auth:sanctum');
