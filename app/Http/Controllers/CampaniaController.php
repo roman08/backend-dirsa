@@ -352,18 +352,27 @@ class CampaniaController extends Controller
 
         $hh = $hora_final[0] . ':' . $minuts . ':' . $secons;
 
-
-
-
-
         $data = [
-            "id_campania" => $times[0]->id,
-            "nombre" => $times[0]->nombre,
-            "estatus" => $times[0]->estatus,
-            "fecha_creacion" => $times[0]->fecha_creacion,
-            "hrs_campania" => $hh,
-            "tot_agents" => $users[0]->tot_agents1,
-        ];
+                "id_campania" => $idCampania,
+                "nombre" => '',
+                "estatus" => '',
+                "fecha_creacion" => '',
+                "hrs_campania" => 0,
+                "tot_agents" =>0,
+            ];
+
+        if(count($times) > 0){
+            $data = [
+                "id_campania" => $times[0]->id,
+                "nombre" => $times[0]->nombre,
+                "estatus" => $times[0]->estatus,
+                "fecha_creacion" => $times[0]->fecha_creacion,
+                "hrs_campania" => $hh,
+                "tot_agents" => $users[0]->tot_agents1,
+            ];
+        }
+
+       
         return response()->json([
             'status' => 'success',
             'message' => 'Datos obtenidos correctamente.',
