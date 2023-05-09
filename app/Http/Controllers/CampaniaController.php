@@ -216,14 +216,15 @@ class CampaniaController extends Controller
 
         try {
             $data = DB::table('agent_hours')
-                ->select( 'agent_hours.day_register as fecha', DB::raw("count('agent_hours.created_at') as total"), DB::raw("TIME_FORMAT(SEC_TO_TIME(SUM(TIME_TO_SEC(agent_hours.tiempo_conexion_agente))), '%H:%i:%s') as tiempo_total"))
+                ->select('count_files.count_file','agent_hours.day_register as fecha', DB::raw("count('agent_hours.created_at') as total"), DB::raw("TIME_FORMAT(SEC_TO_TIME(SUM(TIME_TO_SEC(agent_hours.tiempo_conexion_agente))), '%H:%i:%s') as tiempo_total"))
+                ->leftJoin('count_files', 'count_files.fecha', '=', 'agent_hours.day_register')
                 ->where('agent_hours.tipo_fuente', '=', $id_type_origin)
                 ->where('agent_hours.id_usuario_registro', '=', $id_usuario_registro)
                 ->where('agent_hours.id_campania', '=', $id_campania)
                 ->whereBetween('day_register', [$firstDay, $lastDay])
                 ->groupBy('agent_hours.day_register')
                 ->get();
-
+            
             $datos_configuracion = DB::table('campania_configuracion_por_mes')
                 ->select('*')
                 ->where('id_campania', '=', $id_campania)
