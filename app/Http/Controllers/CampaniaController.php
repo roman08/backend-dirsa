@@ -301,7 +301,7 @@ class CampaniaController extends Controller
     {
         $id = $request->get('id');
 
-        $months = CampaniaConfiguracionPorMes::where('id_campania', '=', $id)->get();
+        $months = CampaniaConfiguracionPorMes::with('campania')->where('id_campania', '=', $id)->get();
 
 
         return response()->json([
