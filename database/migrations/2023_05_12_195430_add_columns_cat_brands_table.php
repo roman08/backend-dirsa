@@ -14,7 +14,7 @@ class AddColumnsCatBrandsTable extends Migration
     public function up()
     {
         Schema::table('cat_brands', function (Blueprint $table) {
-            $table->string('id_status');
+            // $table->string('id_status');
         });
     }
 
