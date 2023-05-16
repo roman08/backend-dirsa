@@ -13,10 +13,10 @@ class UpdateProductsTable extends Migration
      */
     public function up()
     {
-        Schema::table('secctions', function (Blueprint $table) {
+        Schema::table('producs', function (Blueprint $table) {
             $table->dropColumn('photo');
         });
-        Schema::table('secctions', function (Blueprint $table) {
+        Schema::table('producs', function (Blueprint $table) {
             $table->longText('photo');
         });
 
