@@ -29,7 +29,11 @@ class DatabaseSeeder extends Seeder
             // TypePaySeeder::class
             // TypeOriginSeeder::class
             // TypeModuelSeerder::class
-            ModulesSeeder::class
+            // ModulesSeeder::class
+            TypeBloodSeeder::class,
+            CatalogCivilSeeder::class,
+            RelationshipSeeder::class
+
         ]);
         // \App\Models\User::factory(10)->create();
     }
