@@ -8,5 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class CampaniaSupervisor extends Model
 {
     use HasFactory;
+    protected $table = 'campaigns_supervisor_sysca';
      protected $fillable = ['id_campania', 'id_supervisor'];
 }

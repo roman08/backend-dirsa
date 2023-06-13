@@ -14,11 +14,11 @@ class EjecucionAdministrativaSeeder extends Seeder
      */
     public function run()
     {
-        DB::table('ejecucion_administrativas')->insert([
+        DB::table('company_structure_type')->insert([
             'nombre' => 'ESTRUCTURA',
             'estatus' => 'Activo'
         ]);
-        DB::table('ejecucion_administrativas')->insert([
+        DB::table('company_structure_type')->insert([
             'nombre' => 'OPERACION',
             'estatus' => 'Activo'
         ]);

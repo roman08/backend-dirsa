@@ -8,4 +8,5 @@ use Illuminate\Database\Eloquent\Model;
 class Subcategoria extends Model
 {
     use HasFactory;
+    protected $table = 'catalog_company_subcategories';
 }

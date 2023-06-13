@@ -16,7 +16,7 @@ class GeneralController extends Controller
 
     public function getAllAgents()
     {
-        $agents = User::with('campanias')->where('numero_empleado', '>', 0)->where('id_puesto', '=', 1)->orWhere('id_puesto', '=', 2)->orderBy('nombre_completo', 'ASC')->paginate(10);
+        $agents = User::with('campaigns_sysca')->where('numero_empleado', '>', 0)->where('id_puesto', '=', 1)->orWhere('id_puesto', '=', 2)->orderBy('nombre_completo', 'ASC')->paginate(10);
         return response()->json([
             'status' => 'success',
             'message' => 'Agentes obtenidos correctamente',
@@ -76,7 +76,7 @@ class GeneralController extends Controller
     public function agentDetail(Request $request)
     {
         $id = $request->get('id');
-        $agent = User::with('campanias')->find($id);
+        $agent = User::with('campaigns_sysca')->find($id);
 
         return response()->json([
             'status' => 'success',
@@ -105,11 +105,11 @@ class GeneralController extends Controller
         }
 
         $users =
-        DB::table('campania_grupo_agentes')
-        ->select('campania_grupo_agentes.id_grupo', DB::raw("COUNT('grupo_usuarios.id_grupo') as tot_agents1"))
-        ->join('grupo_usuarios', 'grupo_usuarios.id_grupo', '=', 'campania_grupo_agentes.id_grupo')
-        ->where('campania_grupo_agentes.id_campania', '=', 2)
-        ->groupBy('grupo_usuarios.id_grupo')
+        DB::table('campaigns_group_agents_sysca')
+        ->select('campaigns_group_agents_sysca.id_grupo', DB::raw("COUNT('groups_users_sysca.id_grupo') as tot_agents1"))
+        ->join('groups_users_sysca', 'groups_users_sysca.id_grupo', '=', 'campaigns_group_agents_sysca.id_grupo')
+        ->where('campaigns_group_agents_sysca.id_campania', '=', 2)
+        ->groupBy('groups_users_sysca.id_grupo')
         ->get();
 
 

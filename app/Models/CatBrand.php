@@ -7,5 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class CatBrand extends Model
 {
+
     use HasFactory;
+    protected $table = "catalog_brands";
 }

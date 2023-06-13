@@ -8,4 +8,5 @@ use Illuminate\Database\Eloquent\Model;
 class CatTypeOrigin extends Model
 {
     use HasFactory;
+    protected $table = 'catalog_type_origing_sysca';
 }

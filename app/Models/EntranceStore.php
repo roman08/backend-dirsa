@@ -8,4 +8,5 @@ use Illuminate\Database\Eloquent\Model;
 class EntranceStore extends Model
 {
     use HasFactory;
+    protected $table = 'income_stores';
 }

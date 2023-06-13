@@ -133,10 +133,10 @@ class GroupController extends Controller
     }
 
     public function getGroupFilter(){
-         $groups = DB::table('grupos')
+         $groups = DB::table('groups_sysca')
         ->select('*')
         ->whereNotIn('id',(function ($query) {
-            $query->from('campania_grupo_agentes')
+            $query->from('campaigns_group_agents_sysca')
                 ->select('id');
         }))
         ->get();

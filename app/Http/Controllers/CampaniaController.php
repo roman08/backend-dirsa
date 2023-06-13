@@ -215,17 +215,17 @@ class CampaniaController extends Controller
         $mountActuality = $request->get('mountActuality');
 
         try {
-            $data = DB::table('agent_hours')
-                ->select('count_files.count_file','agent_hours.day_register as fecha', DB::raw("count('agent_hours.created_at') as total"), DB::raw("TIME_FORMAT(SEC_TO_TIME(SUM(TIME_TO_SEC(agent_hours.tiempo_conexion_agente))), '%H:%i:%s') as tiempo_total"))
-                ->leftJoin('count_files', 'count_files.fecha', '=', 'agent_hours.day_register')
-                ->where('agent_hours.tipo_fuente', '=', $id_type_origin)
-                ->where('agent_hours.id_usuario_registro', '=', $id_usuario_registro)
-                ->where('agent_hours.id_campania', '=', $id_campania)
+            $data = DB::table('agent_hours_sysca')
+                ->select('count_files.count_file','agent_hours_sysca.day_register as fecha', DB::raw("count('agent_hours_sysca.created_at') as total"), DB::raw("TIME_FORMAT(SEC_TO_TIME(SUM(TIME_TO_SEC(agent_hours_sysca.tiempo_conexion_agente))), '%H:%i:%s') as tiempo_total"))
+                ->leftJoin('count_files', 'count_files.fecha', '=', 'agent_hours_sysca.day_register')
+                ->where('agent_hours_sysca.tipo_fuente', '=', $id_type_origin)
+                ->where('agent_hours_sysca.id_usuario_registro', '=', $id_usuario_registro)
+                ->where('agent_hours_sysca.id_campania', '=', $id_campania)
                 ->whereBetween('day_register', [$firstDay, $lastDay])
-                ->groupBy('agent_hours.day_register')
+                ->groupBy('agent_hours_sysca.day_register')
                 ->get();
             
-            $datos_configuracion = DB::table('campania_configuracion_por_mes')
+            $datos_configuracion = DB::table('campaigns_month_config_sysca')
                 ->select('*')
                 ->where('id_campania', '=', $id_campania)
                 ->where('id_mes', '=', $mountActuality)
@@ -276,14 +276,14 @@ class CampaniaController extends Controller
         $firstDay = $request->get('firstDay');
         $lastDay = $request->get('lastDay');
         $id_campania = $request->get('id_campania');
-        // $respuesta = DB::table('agent_hours')
+        // $respuesta = DB::table('agent_hours_sysca')
         // ->select(DB::raw("count('day_register')", 'nombre_completo_agente'))
         // ->whereBetween('day_register', [$firstDay, $lastDay])
         // ->groupBy('nombre_completo_agente')
         // ->get();
 
 
-        $respuesta = DB::table('agent_hours')
+        $respuesta = DB::table('agent_hours_sysca')
             ->select(DB::raw("count('day_register') as total_days"), 'nombre_completo_agente', 'numero_empleado')
             ->whereBetween('day_register', [$firstDay, $lastDay])
             ->where('id_campania', '=', $id_campania)
@@ -335,11 +335,11 @@ class CampaniaController extends Controller
         }
 
         $users =
-        DB::table('campania_grupo_agentes')
-        ->select('campania_grupo_agentes.id_grupo', DB::raw("COUNT('grupo_usuarios.id_grupo') as tot_agents1"))
-        ->join('grupo_usuarios', 'grupo_usuarios.id_grupo', '=', 'campania_grupo_agentes.id_grupo')
-        ->where('campania_grupo_agentes.id_campania', '=', $idCampania)
-        ->groupBy('grupo_usuarios.id_grupo')
+        DB::table('campaigns_group_agents_sysca')
+        ->select('campaigns_group_agents_sysca.id_grupo', DB::raw("COUNT('groups_users_sysca.id_grupo') as tot_agents1"))
+        ->join('groups_users_sysca', 'groups_users_sysca.id_grupo', '=', 'campaigns_group_agents_sysca.id_grupo')
+        ->where('campaigns_group_agents_sysca.id_campania', '=', $idCampania)
+        ->groupBy('groups_users_sysca.id_grupo')
         ->get();
 
 
@@ -477,7 +477,7 @@ class CampaniaController extends Controller
         $agents = AgentHours::where('id_campania', '=', $id_campania)->where('day_register', '=', $day)->get();
 
 
-        $datos_configuracion = DB::table('campania_configuracion_por_mes')
+        $datos_configuracion = DB::table('campaigns_month_config_sysca')
         ->select('*')
             ->where('id_campania', '=', $id_campania)
             ->where('id_mes', '=', $mes)

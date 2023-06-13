@@ -9,15 +9,16 @@ class Campania extends Model
 {
     use HasFactory;
 
+    protected $table = 'campaigns_sysca';
     protected $fillable = ['nombre', 'estatus', 'fecha_creacion', 'bilingue', 'id_forma_de_pago', 'id_supervisor', 'id_grupo', 'id_type_origin'];
 
     public function leaders(){
 
-        return $this->belongsToMany('App\Models\User', 'campania_supervisors', 'id_campania', 'id_supervisor');
+        return $this->belongsToMany('App\Models\User', 'campaigns_supervisor_sysca', 'id_campania', 'id_supervisor');
     }
 
     public function groups(){
-        return $this->belongsToMany('App\Models\Grupo', 'campania_grupo_agentes', 'id_campania', 'id_grupo');
+        return $this->belongsToMany('App\Models\Grupo', 'campaigns_group_agents_sysca', 'id_campania', 'id_grupo');
         // return $this->hasMany('App\Models\CampaniaGrupoAgentes', 'id_campania', 'id');
     }
 

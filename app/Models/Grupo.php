@@ -9,6 +9,7 @@ class Grupo extends Model
 {
     use HasFactory;
 
+    protected $table = "groups_sysca";
     protected $fillable = ['nombre','estatus', 'id_tipo_agente'];
 
 
@@ -22,6 +23,6 @@ class Grupo extends Model
     public function agentes()
     {
 
-        return $this->belongsToMany('App\Models\User', 'grupo_usuarios', 'id_grupo', 'id_usuario');
+        return $this->belongsToMany('App\Models\User', 'groups_users_sysca', 'id_grupo', 'id_usuario');
     }
 }

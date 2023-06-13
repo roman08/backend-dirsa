@@ -8,4 +8,5 @@ use Illuminate\Database\Eloquent\Model;
 class ModulePermisse extends Model
 {
     use HasFactory;
+    protected $table = 'module_users_permissions';
 }

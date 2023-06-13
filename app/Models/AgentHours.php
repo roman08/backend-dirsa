@@ -9,6 +9,7 @@ class AgentHours extends Model
 {
     use HasFactory;
 
+        protected $table = 'agent_hours_sysca';
         protected $fillable = ['id_usuario_registro',
             'tipo_fuente',
             'numero_empleado',
