@@ -30,10 +30,10 @@ class DatabaseSeeder extends Seeder
             // TypeOriginSeeder::class
             // TypeModuelSeerder::class
             // ModulesSeeder::class
-            TypeBloodSeeder::class,
-            CatalogCivilSeeder::class,
-            RelationshipSeeder::class
-
+            // TypeBloodSeeder::class,
+            // CatalogCivilSeeder::class,
+            // RelationshipSeeder::class
+            modulesAddSeeder::class
         ]);
         // \App\Models\User::factory(10)->create();
     }
