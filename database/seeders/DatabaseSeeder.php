@@ -33,7 +33,8 @@ class DatabaseSeeder extends Seeder
             // TypeBloodSeeder::class,
             // CatalogCivilSeeder::class,
             // RelationshipSeeder::class
-            modulesAddSeeder::class
+            //modulesAddSeeder::class
+            modulesAddConfigSeeder::class
         ]);
         // \App\Models\User::factory(10)->create();
     }
