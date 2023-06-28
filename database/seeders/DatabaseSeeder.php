@@ -29,14 +29,15 @@ class DatabaseSeeder extends Seeder
             // TypePaySeeder::class
             // TypeOriginSeeder::class
             // TypeModuelSeerder::class
-            ModulesSeeder::class,
-            TypeBloodSeeder::class,
-            CatalogCivilSeeder::class,
-            RelationshipSeeder::class,
-            modulesAddSeeder::class,
-            modulesAddConfigSeeder::class,
+            // ModulesSeeder::class,
+            // TypeBloodSeeder::class,
+            // CatalogCivilSeeder::class,
+            // RelationshipSeeder::class,
+            // modulesAddSeeder::class,
+            // modulesAddConfigSeeder::class,
             CauseSeeder::class,
-            ReasonsSeeder::class
+            ReasonsSeeder::class,
+            // ModuleBlackListSeeder::class
         ]);
         // \App\Models\User::factory(10)->create();
     }
