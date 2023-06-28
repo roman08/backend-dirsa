@@ -35,8 +35,8 @@ class DatabaseSeeder extends Seeder
             // RelationshipSeeder::class,
             // modulesAddSeeder::class,
             // modulesAddConfigSeeder::class,
-            CauseSeeder::class,
-            ReasonsSeeder::class,
+            // CauseSeeder::class,
+            // ReasonsSeeder::class,
             // ModuleBlackListSeeder::class
         ]);
         // \App\Models\User::factory(10)->create();
