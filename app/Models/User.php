@@ -52,7 +52,7 @@ class User extends Authenticatable
     public function campanias()
     {
 
-        return $this->belongsToMany('App\Models\Campania', 'campania_supervisors', 'id_supervisor','id_campania',);
+        return $this->belongsToMany('App\Models\Campania', 'campaigns_supervisor_sysca', 'id_supervisor','id_campania',);
     }
 
 }

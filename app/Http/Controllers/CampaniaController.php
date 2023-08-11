@@ -216,7 +216,7 @@ class CampaniaController extends Controller
 
         try {
             $data = DB::table('agent_hours_sysca')
-                ->select('count_files.count_file','agent_hours_sysca.day_register as fecha', DB::raw("count('agent_hours_sysca.created_at') as total"), DB::raw("TIME_FORMAT(SEC_TO_TIME(SUM(TIME_TO_SEC(agent_hours_sysca.tiempo_conexion_agente))), '%H:%i:%s') as tiempo_total"))
+                ->select('count_files.count_file', 'agent_hours_sysca.day_register as fecha', DB::raw("count('agent_hours_sysca.created_at') as total"), DB::raw("TIME_FORMAT(SEC_TO_TIME(SUM(TIME_TO_SEC(agent_hours_sysca.tiempo_conexion_agente))), '%H:%i:%s') as tiempo_total"))
                 ->leftJoin('count_files', 'count_files.fecha', '=', 'agent_hours_sysca.day_register')
                 ->where('agent_hours_sysca.tipo_fuente', '=', $id_type_origin)
                 ->where('agent_hours_sysca.id_usuario_registro', '=', $id_usuario_registro)
@@ -224,7 +224,7 @@ class CampaniaController extends Controller
                 ->whereBetween('day_register', [$firstDay, $lastDay])
                 ->groupBy('agent_hours_sysca.day_register')
                 ->get();
-            
+
             $datos_configuracion = DB::table('campaigns_month_config_sysca')
                 ->select('*')
                 ->where('id_campania', '=', $id_campania)
@@ -318,7 +318,7 @@ class CampaniaController extends Controller
         $mounth = $request->get('mounth');
         $id = $request->get('id');
         $idCampania =
-        $request->get('idCampania');
+            $request->get('idCampania');
         // $respuesta = DB::select('CALL get_hours_admin_fillter(?, ?)', [$mounth, $id]);
         $times = DB::select('CALL get_hours_supervisor(?, ?)', [$mounth, $idCampania]);
         $horas =  array();
@@ -335,12 +335,12 @@ class CampaniaController extends Controller
         }
 
         $users =
-        DB::table('campaigns_group_agents_sysca')
-        ->select('campaigns_group_agents_sysca.id_grupo', DB::raw("COUNT('groups_users_sysca.id_grupo') as tot_agents1"))
-        ->join('groups_users_sysca', 'groups_users_sysca.id_grupo', '=', 'campaigns_group_agents_sysca.id_grupo')
-        ->where('campaigns_group_agents_sysca.id_campania', '=', $idCampania)
-        ->groupBy('groups_users_sysca.id_grupo')
-        ->get();
+            DB::table('campaigns_group_agents_sysca')
+            ->select('campaigns_group_agents_sysca.id_grupo', DB::raw("COUNT('groups_users_sysca.id_grupo') as tot_agents1"))
+            ->join('groups_users_sysca', 'groups_users_sysca.id_grupo', '=', 'campaigns_group_agents_sysca.id_grupo')
+            ->where('campaigns_group_agents_sysca.id_campania', '=', $idCampania)
+            ->groupBy('groups_users_sysca.id_grupo')
+            ->get();
 
 
 
@@ -354,15 +354,15 @@ class CampaniaController extends Controller
         $hh = $hora_final[0] . ':' . $minuts . ':' . $secons;
 
         $data = [
-                "id_campania" => $idCampania,
-                "nombre" => '',
-                "estatus" => '',
-                "fecha_creacion" => '',
-                "hrs_campania" => 0,
-                "tot_agents" =>0,
-            ];
+            "id_campania" => $idCampania,
+            "nombre" => '',
+            "estatus" => '',
+            "fecha_creacion" => '',
+            "hrs_campania" => 0,
+            "tot_agents" => 0,
+        ];
 
-        if(count($times) > 0){
+        if (count($times) > 0) {
             $data = [
                 "id_campania" => $times[0]->id,
                 "nombre" => $times[0]->nombre,
@@ -373,7 +373,7 @@ class CampaniaController extends Controller
             ];
         }
 
-       
+
         return response()->json([
             'status' => 'success',
             'message' => 'Datos obtenidos correctamente.',
@@ -405,18 +405,23 @@ class CampaniaController extends Controller
         $id = $request->get('id');
         // $respuesta = DB::select('CALL hours_campanias_grafica(?)', [$id]);
 
-        $respuesta = DB::select('CALL get_grafica(?)', [$id]);
+        // $respuesta = DB::select('CALL get_grafica(?)', [$id]);
 
+
+        $respuesta = DB::table('agent_hours_sysca as ah')
+            ->select('ah.id_campania', 'ah.tiempo_conexion_agente as hrs_campania', DB::raw('MONTH(ah.day_register) as mes'))
+            ->where('ah.id_campania', $id)
+            ->get();
         $meses = collect($respuesta)->groupBy('mes');
 
 
-       
+
         $horas_f = array();
         foreach ($meses as $key => $value) {
             $horas = array();
-           foreach ($value as $data) {
-             array_push($horas, $data->hrs_campania);
-           }
+            foreach ($value as $data) {
+                array_push($horas, $data->hrs_campania);
+            }
 
             $totalHoras = CarbonInterval::hours(0);
 
@@ -436,7 +441,7 @@ class CampaniaController extends Controller
 
         $hora_e = array();
         foreach ($horas_f as $key => $value) {
-           $time_components = explode(":", $value);
+            $time_components = explode(":", $value);
 
             $hours = intval($time_components[0]);
             $minutes = intval($time_components[1]);
@@ -447,7 +452,7 @@ class CampaniaController extends Controller
 
             $hora_e[$key] = $total_hours;
         }
-        
+
 
 
         $data = [
@@ -456,7 +461,7 @@ class CampaniaController extends Controller
         ];
 
 
-        $ccpm = CampaniaConfiguracionPorMes::where('id_campania', '=',$id)->get();
+        $ccpm = CampaniaConfiguracionPorMes::where('id_campania', '=', $id)->get();
         return response()->json([
             'status' => 'success',
             'message' => 'Datos obtenidos correctamente.',
@@ -465,6 +470,62 @@ class CampaniaController extends Controller
         ], 200);
     }
 
+
+    public function getGrafica(Request $request)
+    {
+        $result = DB::table('agent_hours_sysca as ahs')
+            ->select('ahs.tiempo_conexion_agente', 'ahs.numero_empleado', 'u.sueldo', DB::raw('DAY(ahs.day_register) as day'))
+            ->join('users as u', 'ahs.numero_empleado', '=', 'u.numero_empleado')
+            ->whereMonth('ahs.day_register', 4)
+            ->whereYear('ahs.day_register', 2023)
+            ->where('ahs.id_campania', 1)
+            ->get();
+
+        $dias_mes = 23;
+        $horas_dias = 8;
+        $total_horas_trabajar = $dias_mes * $horas_dias;
+
+
+        $meses = collect($result)->groupBy('day');
+        $hora_e = [];
+        foreach ($meses as $key => $items) {
+            foreach ($items as $item) {
+                $sueldo_mensual = $item->sueldo;
+                /*
+                * Costo hora
+                * $sueldo_mensual / $total_horas_trabajar
+                */
+                $costo_hora =( $sueldo_mensual / $total_horas_trabajar) / 60;
+                // $intervalo = CarbonInterval::createFromFormat('H:i:s', $item->tiempo_conexion_agente);
+                // Parsea el tiempo de conexión en horas, minutos y segundos
+                list($horas, $minutos, $segundos) = explode(':', $item->tiempo_conexion_agente);
+
+                // Calcula el total de minutos trabajados
+                $totalMinutosTrabajados = ($horas * 60) + $minutos + ($segundos / 60);
+
+                // Calcula el total a pagar
+                $totalAPagar = $totalMinutosTrabajados * $costo_hora;
+
+                // Formatea el total a pagar con dos decimales
+                $totalAPagarFormateado = number_format($totalAPagar, 2);
+
+
+
+                $hora_e[] =
+                ['costo' => $costo_hora, 'sueldo' => $sueldo_mensual, 'horas' => $item->tiempo_conexion_agente, 'nomina_dia' => $totalAPagarFormateado, 'costo_hora' =>  $costo_hora];
+            }
+        }
+
+        /*
+        * nomina diaria
+        * $horas_trabajads / $costo_hora
+        */
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Datos obtenidos correctamente.',
+            'data' => $hora_e
+        ], 200);
+    }
     public function get_agents_month(Request $request)
     {
         $id_campania =
@@ -473,12 +534,12 @@ class CampaniaController extends Controller
             $request->get('day_register');
 
         $mes =
-        $request->get('mes');
+            $request->get('mes');
         $agents = AgentHours::where('id_campania', '=', $id_campania)->where('day_register', '=', $day)->get();
 
 
         $datos_configuracion = DB::table('campaigns_month_config_sysca')
-        ->select('*')
+            ->select('*')
             ->where('id_campania', '=', $id_campania)
             ->where('id_mes', '=', $mes)
             ->get()[0];

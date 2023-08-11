@@ -9,7 +9,7 @@ class LeaderContoller extends Controller
     public function getCampaniasLeader( Request $request ){
 
         $id = $request->get('id');
-        $user = User::with('campaigns_sysca')->where('id', '=', $id)->get()[0];
+        $user = User::with('campanias')->where('id', '=', $id)->get()[0];
 
         return response()->json([
             'status' => 'success',
