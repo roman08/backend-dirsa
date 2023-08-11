@@ -473,22 +473,27 @@ class CampaniaController extends Controller
 
     public function getGrafica(Request $request)
     {
+
+        $month = $request->get('month');
+        $year = $request->get('year');
+        $id_campania = $request->get('id_campania');
         $result = DB::table('agent_hours_sysca as ahs')
             ->select('ahs.tiempo_conexion_agente', 'ahs.numero_empleado', 'u.sueldo', DB::raw('DAY(ahs.day_register) as day'))
             ->join('users as u', 'ahs.numero_empleado', '=', 'u.numero_empleado')
-            ->whereMonth('ahs.day_register', 4)
-            ->whereYear('ahs.day_register', 2023)
-            ->where('ahs.id_campania', 1)
+            ->whereMonth('ahs.day_register',$month)
+            ->whereYear('ahs.day_register', $year)
+            ->where('ahs.id_campania', $id_campania)
             ->get();
 
         $dias_mes = 23;
         $horas_dias = 8;
         $total_horas_trabajar = $dias_mes * $horas_dias;
-
-
+        $nomina_total = 0;
+        $nomina_diaria = 0;
         $meses = collect($result)->groupBy('day');
         $hora_e = [];
         foreach ($meses as $key => $items) {
+             $nomina_diaria = 0;
             foreach ($items as $item) {
                 $sueldo_mensual = $item->sueldo;
                 /*
@@ -509,11 +514,13 @@ class CampaniaController extends Controller
                 // Formatea el total a pagar con dos decimales
                 $totalAPagarFormateado = number_format($totalAPagar, 2);
 
-
-
-                $hora_e[] =
-                ['costo' => $costo_hora, 'sueldo' => $sueldo_mensual, 'horas' => $item->tiempo_conexion_agente, 'nomina_dia' => $totalAPagarFormateado, 'costo_hora' =>  $costo_hora];
+                $nomina_total = $nomina_total + $totalAPagarFormateado;
+                $nomina_diaria =  $nomina_diaria + $totalAPagarFormateado;
+                // $hora_e[$key][] =
+                // ['costo' => $costo_hora, 'sueldo' => $sueldo_mensual, 'horas' => $item->tiempo_conexion_agente, 'nomina_dia' => $totalAPagarFormateado, 'costo_hora' =>  $costo_hora];
             }
+
+            $hora_e[$key]['nomina_dia'] = number_format($nomina_diaria, 2);
         }
 
         /*
@@ -523,7 +530,8 @@ class CampaniaController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Datos obtenidos correctamente.',
-            'data' => $hora_e
+            'data' => $hora_e,
+            '$nomina_total' => number_format($nomina_total,2)
         ], 200);
     }
     public function get_agents_month(Request $request)
