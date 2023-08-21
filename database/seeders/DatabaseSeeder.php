@@ -15,7 +15,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             // TipoUsuarioSeeder::class,
-            // UserSeeder::class,
+            UserSeeder::class,
             // PuestosSeeder::class,
             // SexoSeeder::class,
             // EmpresasSeeder::class,
@@ -38,7 +38,7 @@ class DatabaseSeeder extends Seeder
             // CauseSeeder::class,
             // ReasonsSeeder::class,
             // ModuleBlackListSeeder::class
-            statusUpdate::class
+            // statusUpdate::class
         ]);
         // \App\Models\User::factory(10)->create();
     }

@@ -33,17 +33,37 @@ class UserSeeder extends Seeder
         //     'email_personal' => '',
         //     'img_profile' => ''
         // ]);
+
+        //  USUARIO ADMIN
+        // DB::table('users')->insert([
+        //     'nombre' => 'Usuario - admin',
+        //     'usuario' => 'admin',
+        //     'email' => 'admin@google.com',
+        //     'password' => Hash::make('admin123'),
+        //     'id_tipo_usuario' => 2,
+        //     'apellido_pat' => 'admin',
+        //     'apellido_mat' => 'admin',
+        //     'id_ubicacion' => 1,
+        //     'id_empresa_rh' => 1,
+        //     'nombre_completo' => 'Usuario - admin',
+        //     'numero_empleado' => 1,
+        //     'id_puesto' => 1,
+        //     'id_estatus' => 1,
+        //     'email_personal' => '',
+        //     'img_profile' => ''
+        // ]);
+
         DB::table('users')->insert([
-            'nombre' => 'Usuario - admin',
-            'usuario' => 'admin',
-            'email' => 'admin@google.com',
-            'password' => Hash::make('admin123'),
+            'nombre' => 'Melanie',
+            'usuario' => 'melanie',
+            'email' => 'Melanie.escutia@dirsamexico.com',
+            'password' => Hash::make('melanie123'),
             'id_tipo_usuario' => 2,
-            'apellido_pat' => 'admin',
-            'apellido_mat' => 'admin',
+            'apellido_pat' => '',
+            'apellido_mat' => '',
             'id_ubicacion' => 1,
             'id_empresa_rh' => 1,
-            'nombre_completo' => 'Usuario - admin',
+            'nombre_completo' => 'Melanie',
             'numero_empleado' => 1,
             'id_puesto' => 1,
             'id_estatus' => 1,
