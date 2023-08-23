@@ -17,4 +17,13 @@ class CampaniaConfiguracionPorMes extends Model
     {
         return $this->hasOne('App\Models\Campania', 'id', 'id_campania');
     }
+
+
+    public function dias()
+    {
+
+
+        return $this->hasMany('App\Models\AgentHours', 'id_campania', 'id_campania')
+        ->whereRaw('MONTH(day_register) = ?', [$this->id_mes]);
+    }
 }

@@ -28,4 +28,11 @@ class AgentHours extends Model
             'tiempo_reuniones_agente',
             'id_campania',
             'day_register'];
+
+
+
+    public function configuracionMes()
+    {
+        return $this->belongsTo('App\Models\CampaniaConfiguracionPorMes', 'id_campania', 'id_campania');
+    }
 }
