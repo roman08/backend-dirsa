@@ -80,6 +80,7 @@ Route::get('/leader/campanias', [LeaderContoller::class, 'getCampaniasLeader']);
 
 // ROUTES ADMIN GRAFICA
 Route::get('/admin/grafica', [CampaniaController::class, 'getGrafica']);
+Route::get('/admin/geDataDays', [CampaniaController::class, 'geDataDays']);
 
 // TODO: RUTAS ENTRENADOR
 Route::get('/obtenerEntrenadores', [CoachController::class, 'index'])->middleware('auth:sanctum');
