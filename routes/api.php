@@ -7,7 +7,7 @@ use App\Http\Controllers\GeneralController;
 use App\Http\Controllers\CampaniaController;
 use App\Http\Controllers\CheckHoursController;
 use App\Http\Controllers\LeaderContoller;
-
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -81,6 +81,9 @@ Route::get('/leader/campanias', [LeaderContoller::class, 'getCampaniasLeader']);
 // ROUTES ADMIN GRAFICA
 Route::get('/admin/grafica', [CampaniaController::class, 'getGrafica']);
 Route::get('/admin/geDataDays', [CampaniaController::class, 'geDataDays']);
+
+// ROUTES ACLARACINES
+Route::get('/clarifications/getUser', [UserController::class, 'getUser']);
 
 // TODO: RUTAS ENTRENADOR
 Route::get('/obtenerEntrenadores', [CoachController::class, 'index'])->middleware('auth:sanctum');
