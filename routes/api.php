@@ -8,6 +8,8 @@ use App\Http\Controllers\CampaniaController;
 use App\Http\Controllers\CheckHoursController;
 use App\Http\Controllers\LeaderContoller;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ClarifiactionController;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -84,6 +86,7 @@ Route::get('/admin/geDataDays', [CampaniaController::class, 'geDataDays']);
 
 // ROUTES ACLARACINES
 Route::get('/clarifications/getUser', [UserController::class, 'getUser']);
+Route::post('/clarifications/create', [ClarifiactionController::class, 'create']);
 
 // TODO: RUTAS ENTRENADOR
 Route::get('/obtenerEntrenadores', [CoachController::class, 'index'])->middleware('auth:sanctum');
