@@ -87,6 +87,8 @@ Route::get('/admin/geDataDays', [CampaniaController::class, 'geDataDays']);
 // ROUTES ACLARACINES
 Route::get('/clarifications/getUser', [UserController::class, 'getUser']);
 Route::post('/clarifications/create', [ClarifiactionController::class, 'create']);
+Route:: get('/clarifications/getCatClarificatiosn', [ClarifiactionController::class, 'getCatClarificatiosn']);
+Route::get('/clarifications/getAll', [ClarifiactionController::class, 'getAll']);
 
 // TODO: RUTAS ENTRENADOR
 Route::get('/obtenerEntrenadores', [CoachController::class, 'index'])->middleware('auth:sanctum');

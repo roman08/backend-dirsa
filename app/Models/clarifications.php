@@ -10,11 +10,15 @@ class clarifications extends Model
     use HasFactory;
 
     protected $fillable = [
-        'id_user',
+        'campaign_id',
+        'cut_date',
+        'date',
+        'employee_number',
         'file',
+        'hours',
         'id_categorie',
-        'days',
-        'metadata',
-        'observations'
+        'id_user',
+        'name',
+        'observations',
     ];
 }
