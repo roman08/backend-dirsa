@@ -48,7 +48,7 @@ class ClarifiactionController extends Controller
 
         $ruta = Storage::path($imagen->file);
         // return response()->json(['error' => $ruta], 404);
-        return response()->download($ruta, 'test');
+        return response()->download($ruta, 'comprobante_de_ausencia');
     }
 
 
