@@ -543,6 +543,7 @@ class CampaniaController extends Controller
                 array_push($horas, $key->tiempo_conexion_agente);
             }
 
+
             // Crea el acumulador con el valor inicial de 0 horas
             $totalHoras = CarbonInterval::hours(0);
 

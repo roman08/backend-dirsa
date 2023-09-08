@@ -200,6 +200,8 @@ class CheckHoursController extends Controller
                     ];
                     CountFile::create($coutnt_file);
                     break;
+
+                    // TALA
                 case 2:
                     $userNotValid = array();
 
@@ -239,7 +241,12 @@ class CheckHoursController extends Controller
                                     'id_campania' => $request['id_campania'],
                                     'day_register' => $request['day_register'],
                                 ];
-                               
+
+                                return response()->json([
+                                    'status' => 'success',
+                                    'msg' => ' Datos guardados correctamente.',
+                                    'data' => $data,
+                                ]);
                                 AgentHours::create($data);
                             }
                         } else {
