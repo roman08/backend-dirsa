@@ -90,6 +90,9 @@ Route::post('/clarifications/create', [ClarifiactionController::class, 'create']
 Route:: get('/clarifications/getCatClarificatiosn', [ClarifiactionController::class, 'getCatClarificatiosn']);
 Route::get('/clarifications/getAll', [ClarifiactionController::class, 'getAll']);
 
+Route::get('/clarifications/donwloadFile', [ClarifiactionController::class, 'donwloadFile']);
+Route::post('/clarifications/filtros', [ClarifiactionController::class, 'filtros']);
+
 // TODO: RUTAS ENTRENADOR
 Route::get('/obtenerEntrenadores', [CoachController::class, 'index'])->middleware('auth:sanctum');
 Route::post('/crearEntrenador', [CoachController::class, 'store']);

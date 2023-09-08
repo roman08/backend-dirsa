@@ -21,4 +21,10 @@ class clarifications extends Model
         'name',
         'observations',
     ];
+
+
+    public function cat()
+    {
+        return $this->belongsTo('App\Models\categories_clarifications', 'id_categorie', 'id');
+    }
 }
