@@ -9,6 +9,7 @@ use App\Http\Controllers\CheckHoursController;
 use App\Http\Controllers\LeaderContoller;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ClarifiactionController;
+use App\Http\Controllers\CourtController;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -92,6 +93,12 @@ Route::get('/clarifications/getAll', [ClarifiactionController::class, 'getAll'])
 
 Route::get('/clarifications/donwloadFile', [ClarifiactionController::class, 'donwloadFile']);
 Route::post('/clarifications/filtros', [ClarifiactionController::class, 'filtros']);
+
+
+//  ROUTES COURTS
+Route::get('/court/getAll', [CourtController::class, 'getAll']);
+Route::post('/court/create', [CourtController::class, 'create']);
+Route::delete('/court/delete', [CourtController::class, 'delete']);
 
 // TODO: RUTAS ENTRENADOR
 Route::get('/obtenerEntrenadores', [CoachController::class, 'index'])->middleware('auth:sanctum');
