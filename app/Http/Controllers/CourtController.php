@@ -74,7 +74,6 @@ class CourtController extends Controller
                 'msg' => ' Error al actualizar las fechas.',
                 'data' => $error_code
             ], 200);
-
         }
     }
 
@@ -88,6 +87,33 @@ class CourtController extends Controller
             'status' => 'success',
             'message' => 'Fechas de corte  obtenidas correctamente.',
             'data' => $request->get('id')
+        ], 200);
+    }
+
+    public function filter(Request $request)
+    {
+        $year = $request['year'];
+        $court = $request['court'];
+
+        $payrollCuts = PayrollCut::where('yaer', $year);
+
+        switch ($court) {
+            case 2:
+                $payrollCuts->where('court', '15-30');
+                break;
+            case 3:
+                $payrollCuts->where('court', '7-22');
+                break;
+        }
+
+
+        $resul = $payrollCuts->get();
+
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Fechas de corte  obtenidas correctamente.',
+            'data' => $resul
         ], 200);
     }
 }
