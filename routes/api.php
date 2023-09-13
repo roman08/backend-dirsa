@@ -98,7 +98,8 @@ Route::post('/clarifications/filtros', [ClarifiactionController::class, 'filtros
 //  ROUTES COURTS
 Route::get('/court/getAll', [CourtController::class, 'getAll']);
 Route::post('/court/create', [CourtController::class, 'create']);
-Route::delete('/court/delete', [CourtController::class, 'delete']);
+Route::delete( '/court/delete', [CourtController::class, 'delete']);
+Route::put('/court/edit', [CourtController::class, 'edit']);
 
 // TODO: RUTAS ENTRENADOR
 Route::get('/obtenerEntrenadores', [CoachController::class, 'index'])->middleware('auth:sanctum');
