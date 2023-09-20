@@ -525,7 +525,7 @@ class CampaniaController extends Controller
                     // $hora_e[$key][] =
                     // ['costo' => $costo_hora, 'sueldo' => $sueldo_mensual, 'horas' => $item->tiempo_conexion_agente, 'nomina_dia' => $totalAPagarFormateado, 'costo_hora' =>  $costo_hora];
                     $empleadosDia++;
-                    array_push($empleado, ['numero_empleado' => $item->numero_empleado, 'nombre' => $item->nombre_completo, 'horas_sistema' => $item->tiempo_conexion_agente, 'horas_meta' => $months->hrs_jornada, 'costo_nomina' => $totalAPagarFormateado ]);
+                    array_push($empleado, ['numero_empleado' => $item->numero_empleado, 'nombre' => $item->nombre_completo, 'horas_sistema' => $item->tiempo_conexion_agente, 'horas_meta' => $months->hrs_jornada, 'costo_nomina' => $totalAPagarFormateado]);
                 }
 
                 $hora_e[$key]['nomina_dia'] = number_format($nomina_diaria, 2);
@@ -614,8 +614,9 @@ class CampaniaController extends Controller
 
 
 
-    public function get_data_campania_months(Request $request){
-    
+    public function get_data_campania_months(Request $request)
+    {
+
         $id = $request->get('id');
 
         $configuracion_mes = CampaniaConfiguracionPorMes::where('id_campania', $id)
@@ -633,7 +634,7 @@ class CampaniaController extends Controller
                 DB::table('agent_hours_sysca as ahs')
                 ->select('ahs.tiempo_conexion_agente', 'ahs.numero_empleado', 'u.sueldo', 'u.nombre_completo', DB::raw('DAY(ahs.day_register) as day'))
                 ->join('users as u', 'ahs.numero_empleado', '=', 'u.numero_empleado')
-                ->where('id_campania', $id)
+                ->where('ahs.id_campania', $id)
                 ->whereMonth('day_register', $configuracion->id_mes)
                 ->get();
 
@@ -732,9 +733,9 @@ class CampaniaController extends Controller
         $year = $request->get('year');
         $id_campania = $request->get('id_campania');
         $result = DB::table('agent_hours_sysca as ahs')
-        ->select('ahs.day_register','ahs.tiempo_conexion_agente', 'ahs.numero_empleado', 'u.sueldo', 'u.nombre_completo', DB::raw('DAY(ahs.day_register) as day'))
-        ->join('users as u', 'ahs.numero_empleado', '=', 'u.numero_empleado')
-        ->whereMonth('ahs.day_register', $month)
+            ->select('ahs.day_register', 'ahs.tiempo_conexion_agente', 'ahs.numero_empleado', 'u.sueldo', 'u.nombre_completo', DB::raw('DAY(ahs.day_register) as day'))
+            ->join('users as u', 'ahs.numero_empleado', '=', 'u.numero_empleado')
+            ->whereMonth('ahs.day_register', $month)
             ->whereYear('ahs.day_register', $year)
             ->where('ahs.id_campania', $id_campania)
             ->get();
@@ -807,8 +808,6 @@ class CampaniaController extends Controller
                 $hora_e[$key]['empleados'] = $empleado;
                 $hora_e[$key]['fecha'] = $fecha;
                 $hora_e[$key]['horas_dia'] = $horas_dia;
-
-
             }
             /*
         * nomina diaria
@@ -861,5 +860,216 @@ class CampaniaController extends Controller
             'message' => 'Sin datos.',
             'data' => [],
         ], 200);
+    }
+
+
+    public function get_data_grafica_report(Request $request)
+    {
+
+        $id = $request->get('id');
+        $fechaInicio = $request->get('fechaInicio');
+        $fechaFin = $request->get('fechaFin');
+        $mes = date('m', strtotime($fechaInicio));
+
+
+        $respuesta = DB::table('agent_hours_sysca as ah')
+            ->select('ah.id_campania', 'ah.tiempo_conexion_agente as hrs_campania', DB::raw('MONTH(ah.day_register) as mes'))
+            ->where('ah.id_campania', $id)
+            ->whereBetween('ah.day_register', [$fechaInicio, $fechaFin]) // Aquí defines el rango de fechas
+            ->get();
+
+        $meses = collect($respuesta)->groupBy('mes');
+
+
+
+        $horas_f = array();
+        foreach ($meses as $key => $value) {
+            $horas = array();
+            foreach ($value as $data) {
+                array_push($horas, $data->hrs_campania);
+            }
+
+            $totalHoras = CarbonInterval::hours(0);
+
+            // Recorre el arreglo de tiempos y agrega cada tiempo al acumulador
+            foreach ($horas as $hora) {
+                $intervalo = CarbonInterval::createFromFormat('H:i:s', $hora);
+                $totalHoras->add($intervalo);
+            }
+
+            $hora_final = explode(":", $totalHoras->format('%H:%I:%S'));
+            $minuts = substr($hora_final[1], 0, 2);
+            $secons = substr($hora_final[2], 0, 2);
+
+            $horas_f[$key] = $hora_final[0] . ':' . $minuts . ':' . $secons;
+        }
+
+
+        $hora_e = array();
+        foreach ($horas_f as $key => $value) {
+            $time_components = explode(":", $value);
+
+            $hours = intval($time_components[0]);
+            $minutes = intval($time_components[1]);
+            $seconds = intval($time_components[2]);
+
+            $total_seconds = ($hours * 3600) + ($minutes * 60) + $seconds;
+            $total_hours = $total_seconds / 3600;
+
+            $hora_e[$key] = $total_hours;
+        }
+
+
+
+        $data = [
+            'horas' => collect($horas_f),
+            'hora_grafica' => collect($hora_e)
+        ];
+
+
+        $ccpm = CampaniaConfiguracionPorMes::where('id_campania', '=', $id)->where('id_mes', '=', $mes)->get();
+
+
+
+
+        $result = DB::table('agent_hours_sysca as ahs')
+            ->select('ahs.day_register', 'ahs.tiempo_conexion_agente', 'ahs.numero_empleado', 'u.sueldo', 'u.nombre_completo', DB::raw('DAY(ahs.day_register) as day'))
+            ->join('users as u', 'ahs.numero_empleado', '=', 'u.numero_empleado')
+            ->whereBetween('ahs.day_register', [$fechaInicio, $fechaFin])
+            ->where('ahs.id_campania', $id)
+            ->get();
+
+
+
+        if (count($result) > 0) {
+            $dias_mes = $ccpm[0]->dias_habiles;
+            // $horas_dias = 8;
+            $horas_dias = $ccpm[0]->hrs_jornada;
+            $total_horas_trabajar = $dias_mes * $horas_dias;
+            $nomina_total = 0;
+            $nomina_diaria = 0;
+            $meses = collect($result)->groupBy('numero_empleado');
+
+
+            $hora_e = array();
+            foreach ($meses as $key => $items) {
+                $horas_day = array();
+                $nomina_diaria = 0;
+                $empleadosDia = 0;
+                $empleado = [];
+                $fecha = '';
+                foreach ($items as $item) {
+                    $sueldo_mensual = $item->sueldo;
+                    
+                    /*
+                    * Costo hora
+                    * $sueldo_mensual / $total_horas_trabajar
+                    */
+                    $costo_hora = ($sueldo_mensual / $total_horas_trabajar) / 60;
+                    // Parsea el tiempo de conexión en horas, minutos y segundos
+                    list($horas, $minutos, $segundos) = explode(':', $item->tiempo_conexion_agente);
+
+                    // Calcula el total de minutos trabajados
+                    $totalMinutosTrabajados = ($horas * 60) + $minutos + ($segundos / 60);
+
+                    // Calcula el total a pagar
+                    $totalAPagar = $totalMinutosTrabajados * $costo_hora;
+
+                    // Formatea el total a pagar con dos decimales
+                    $totalAPagarFormateado = number_format($totalAPagar, 2);
+
+                    $nomina_total = $nomina_total + $totalAPagar;
+                    $nomina_diaria =  $nomina_diaria + $totalAPagar;
+                    // $hora_e[$key][] =
+                    $empleadosDia++;
+                    $fecha = $item->day_register;
+                    array_push($horas_day, $item->tiempo_conexion_agente);
+                }
+
+              
+                
+                // Crea el acumulador con el valor inicial de 0 horas
+                $totalHorasDay = CarbonInterval::hours(0);
+                
+                // Recorre el arreglo de tiempos y agrega cada tiempo al acumulador
+                foreach ($horas_day as $horaDay) {
+                    $intervalo = CarbonInterval::createFromFormat('H:i:s', $horaDay);
+                    $totalHorasDay->add($intervalo);
+                }
+                
+                $hora_final = explode(":", $totalHorasDay->format('%H:%I:%S'));
+                $minuts = substr($hora_final[1], 0, 2);
+                $secons = substr($hora_final[2], 0, 2);
+                
+                
+                $horas_dia = $hora_final[0] . ':' . $minuts . ':' . $secons;
+                
+                array_push($empleado, ['numero_empleado' => $item->numero_empleado, 'nombre' => $item->nombre_completo, 'horas_sistema' => $item->tiempo_conexion_agente, 'horas_meta' => $ccpm[0]->hrs_jornada, 'costo_nomina' =>  $nomina_diaria]);
+
+                $hora_e[$key]['nomina_dia'] = number_format($nomina_diaria, 2);
+                $hora_e[$key]['empleadosDia'] = $empleadosDia;
+                $hora_e[$key]['empleados'] = $empleado;
+                $hora_e[$key]['fecha'] = $fecha;
+                $hora_e[$key]['horas_dia'] = $horas_dia;
+            }
+            /*
+                    * nomina diaria
+                    * $horas_trabajads / $costo_hora
+                    */
+
+
+            // $horas = array();
+            // foreach ($result as $key) {
+            //     array_push($horas, $key->tiempo_conexion_agente);
+            // }
+
+            // // Crea el acumulador con el valor inicial de 0 horas
+            // $totalHoras = CarbonInterval::hours(0);
+
+            // // Recorre el arreglo de tiempos y agrega cada tiempo al acumulador
+            // foreach ($horas as $hora) {
+            //     $intervalo = CarbonInterval::createFromFormat('H:i:s', $hora);
+            //     $totalHoras->add($intervalo);
+            // }
+
+            // $hora_final = explode(":", $totalHoras->format('%H:%I:%S'));
+            // $minuts = substr($hora_final[1], 0, 2);
+            // $secons = substr($hora_final[2], 0, 2);
+
+
+            // $hh = $hora_final[0] . ':' . $minuts . ':' . $secons;
+
+
+
+
+            // $totalSumado = AgentHours::whereMonth('day_register', $month)
+            // ->distinct('numero_empleado')
+            // ->count('numero_empleado');
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Datos obtenidos correctamente.',
+                'data' => $data,
+                'nomina_total' => number_format($nomina_total, 2),
+                'data2' => $hora_e,
+                'ccpm' => $ccpm,
+                '$empleado' => $empleado
+            ], 200);
+
+            // return response()->json([
+            //     'status' => 'success',
+            //     'message' => 'Datos obtenidos correctamente.',
+            //     'data' => $data,
+            //     'ccpm' => $ccpm,
+            //     'empleados' => $empleados
+            // ], 200);
+        }
+        // return response()->json([
+        //     'status' => 'success',
+        //     'message' => 'Datos obtenidos correctamente.',
+        //     'data' => $data,
+        //     'ccpm' => $ccpm,
+        //     'empleados' => $empleados
+        // ], 200);
     }
 }
