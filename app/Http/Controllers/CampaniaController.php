@@ -871,6 +871,11 @@ class CampaniaController extends Controller
         $fechaFin = $request->get('fechaFin');
         $mes = date('m', strtotime($fechaInicio));
 
+        // $timestamp1 = strtotime($fechaInicio);
+        // $timestamp2 = strtotime($fechaFin);
+        // $diferencia = $timestamp2 - $timestamp1;
+        // $dias = $diferencia / (60 * 60 * 24) + 1; 
+
 
         $respuesta = DB::table('agent_hours_sysca as ah')
             ->select('ah.id_campania', 'ah.tiempo_conexion_agente as hrs_campania', DB::raw('MONTH(ah.day_register) as mes'))
@@ -929,9 +934,13 @@ class CampaniaController extends Controller
 
         $ccpm = CampaniaConfiguracionPorMes::where('id_campania', '=', $id)->where('id_mes', '=', $mes)->get();
 
+        $dias_habiles = $ccpm[0]->dias_habiles;
+        $costo_nomina_total = $ccpm[0]->monto_fijo_mensual;
 
 
+       
 
+  
         $result = DB::table('agent_hours_sysca as ahs')
             ->select('ahs.day_register', 'ahs.tiempo_conexion_agente', 'ahs.numero_empleado', 'u.sueldo', 'u.nombre_completo', DB::raw('DAY(ahs.day_register) as day'))
             ->join('users as u', 'ahs.numero_empleado', '=', 'u.numero_empleado')
@@ -939,15 +948,18 @@ class CampaniaController extends Controller
             ->where('ahs.id_campania', $id)
             ->get();
 
-
-
+        $dias_total_registos = collect($result)->groupBy('day');
+        $dias = count($dias_total_registos);
+        $facturacion = ($costo_nomina_total / $dias_habiles) * $dias;
         if (count($result) > 0) {
             $dias_mes = $ccpm[0]->dias_habiles;
-            // $horas_dias = 8;
             $horas_dias = $ccpm[0]->hrs_jornada;
             $total_horas_trabajar = $dias_mes * $horas_dias;
             $nomina_total = 0;
             $nomina_diaria = 0;
+            
+
+
             $meses = collect($result)->groupBy('numero_empleado');
 
 
@@ -1012,39 +1024,7 @@ class CampaniaController extends Controller
                 $hora_e[$key]['fecha'] = $fecha;
                 $hora_e[$key]['horas_dia'] = $horas_dia;
             }
-            /*
-                    * nomina diaria
-                    * $horas_trabajads / $costo_hora
-                    */
 
-
-            // $horas = array();
-            // foreach ($result as $key) {
-            //     array_push($horas, $key->tiempo_conexion_agente);
-            // }
-
-            // // Crea el acumulador con el valor inicial de 0 horas
-            // $totalHoras = CarbonInterval::hours(0);
-
-            // // Recorre el arreglo de tiempos y agrega cada tiempo al acumulador
-            // foreach ($horas as $hora) {
-            //     $intervalo = CarbonInterval::createFromFormat('H:i:s', $hora);
-            //     $totalHoras->add($intervalo);
-            // }
-
-            // $hora_final = explode(":", $totalHoras->format('%H:%I:%S'));
-            // $minuts = substr($hora_final[1], 0, 2);
-            // $secons = substr($hora_final[2], 0, 2);
-
-
-            // $hh = $hora_final[0] . ':' . $minuts . ':' . $secons;
-
-
-
-
-            // $totalSumado = AgentHours::whereMonth('day_register', $month)
-            // ->distinct('numero_empleado')
-            // ->count('numero_empleado');
 
             return response()->json([
                 'status' => 'success',
@@ -1053,23 +1033,17 @@ class CampaniaController extends Controller
                 'nomina_total' => number_format($nomina_total, 2),
                 'data2' => $hora_e,
                 'ccpm' => $ccpm,
-                '$empleado' => $empleado
+                '$empleado' => $empleado,
+                'facturacion' => $facturacion
             ], 200);
 
-            // return response()->json([
-            //     'status' => 'success',
-            //     'message' => 'Datos obtenidos correctamente.',
-            //     'data' => $data,
-            //     'ccpm' => $ccpm,
-            //     'empleados' => $empleados
-            // ], 200);
+
         }
-        // return response()->json([
-        //     'status' => 'success',
-        //     'message' => 'Datos obtenidos correctamente.',
-        //     'data' => $data,
-        //     'ccpm' => $ccpm,
-        //     'empleados' => $empleados
-        // ], 200);
+        return response()->json([
+            'status' => 'error',
+            'message' => 'No se encontraron registros en el rango solicitado.',
+        ], 200);
+
+
     }
 }
