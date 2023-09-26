@@ -12,6 +12,9 @@ use App\Models\AgentHours;
 use Illuminate\Support\Facades\DB;
 use Carbon\CarbonInterval;
 use Carbon\Carbon;
+use App\Models\exchangeRate;
+
+
 
 class CampaniaController extends Controller
 {
@@ -933,9 +936,29 @@ class CampaniaController extends Controller
 
 
         $ccpm = CampaniaConfiguracionPorMes::where('id_campania', '=', $id)->where('id_mes', '=', $mes)->get();
+        $precio_hr = $ccpm[0]->precio_hr;
 
+       
+        if($ccpm[0]->tipo_moneda == 2){
+            // obtener el tipo de cambio y hacer la convercion a pesos mexicanos
+            $fechaActual = Carbon::now();
+
+            // Puedes formatear la fecha como desees, por ejemplo:
+            $fechaFormateada = $fechaActual->format('Y-m-d');
+            $resultado = exchangeRate::whereDate('date', '=', $fechaFormateada)->get();
+
+            $typy_c = (!empty($resultado[0]->exchange_rate_sale_doit)) ? $resultado[0]->exchange_rate_sale_doit : $resultado[0]->exchange_rate_sale;
+            // $precio_hr = $ccpm[0]->precio_hr * $resultado[0]->exchange_rate_sale_doit;
+
+            $precio_hr = $ccpm[0]->precio_hr * $typy_c;
+
+ 
+        }
         $dias_habiles = $ccpm[0]->dias_habiles;
         $costo_nomina_total = $ccpm[0]->monto_fijo_mensual;
+
+        $hrs_jornada = $ccpm[0]->hrs_jornada;
+       
 
 
        
@@ -951,6 +974,11 @@ class CampaniaController extends Controller
         $dias_total_registos = collect($result)->groupBy('day');
         $dias = count($dias_total_registos);
         $facturacion = ($costo_nomina_total / $dias_habiles) * $dias;
+
+
+       
+
+
         if (count($result) > 0) {
             $dias_mes = $ccpm[0]->dias_habiles;
             $horas_dias = $ccpm[0]->hrs_jornada;
@@ -1025,7 +1053,11 @@ class CampaniaController extends Controller
                 $hora_e[$key]['horas_dia'] = $horas_dia;
             }
 
-
+            $costo_facturacion = 0;
+            foreach ($dias_total_registos as $value) {
+                $total = ($hrs_jornada * $precio_hr) * count($value);
+                $costo_facturacion = $costo_facturacion + $total;
+            }
             return response()->json([
                 'status' => 'success',
                 'message' => 'Datos obtenidos correctamente.',
@@ -1034,7 +1066,7 @@ class CampaniaController extends Controller
                 'data2' => $hora_e,
                 'ccpm' => $ccpm,
                 '$empleado' => $empleado,
-                'facturacion' => $facturacion
+                'facturacion' => $costo_facturacion
             ], 200);
 
 

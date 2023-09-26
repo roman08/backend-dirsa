@@ -8,4 +8,5 @@ use Illuminate\Database\Eloquent\Model;
 class exchangeRate extends Model
 {
     use HasFactory;
+    protected $table = 'exchange_rate';
 }
