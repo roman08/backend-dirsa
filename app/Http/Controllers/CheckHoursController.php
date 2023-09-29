@@ -154,6 +154,7 @@ class CheckHoursController extends Controller
         $totalRegistros = 0;
         try {
             switch ($tipo_fuente) {
+                // COX
                 case 1:
 
                     unset($datos[0]);
@@ -241,12 +242,6 @@ class CheckHoursController extends Controller
                                     'id_campania' => $request['id_campania'],
                                     'day_register' => $request['day_register'],
                                 ];
-
-                                return response()->json([
-                                    'status' => 'success',
-                                    'msg' => ' Datos guardados correctamente.',
-                                    'data' => $data,
-                                ]);
                                 AgentHours::create($data);
                             }
                         } else {
