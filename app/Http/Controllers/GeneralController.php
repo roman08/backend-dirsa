@@ -52,7 +52,7 @@ class GeneralController extends Controller
     public function getLeaders()
     {
 
-        $leaders = User::select('id', 'nombre_completo')->where('id_puesto', '=', 37)->orderBy('nombre_completo', 'ASC')->get();
+        $leaders = User::select('id', 'nombre_completo')->where('id_puesto', '=', 37)->where('id_estatus', '=', 1)->orderBy('nombre_completo', 'ASC')->get();
 
         return response()->json([
             'status' => 'success',
