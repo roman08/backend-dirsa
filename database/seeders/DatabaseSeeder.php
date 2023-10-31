@@ -39,7 +39,8 @@ class DatabaseSeeder extends Seeder
             // ReasonsSeeder::class,
             // ModuleBlackListSeeder::class
             // statusUpdate::class
-            categoriesClarifitactionsSeeder::class
+            // categoriesClarifitactionsSeeder::class
+            RecruitmentIndustriesSeeder::class
         ]);
         // \App\Models\User::factory(10)->create();
     }
